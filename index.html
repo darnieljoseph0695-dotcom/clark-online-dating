@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="UTF-8" />
+<title>Clark Online Dating</title>
+<style>
+/* BODY & TEXT */
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  overflow-x: hidden;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* DARK MODE */
+body.dark { background:#121212; color:white; }
+body.dark .overlay { background: rgba(0,0,0,0.6); }
+body.dark input, body.dark select { background:#222; color:white; }
+body.dark #publicMessages, body.dark #privateMessages { background:#1e1e1e; color:white; }
+
+/* BACKGROUND DIVS FOR CROSSFADE */
+.bgDiv {
+  position: fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background-size: cover;
+  background-position: center;
+  z-index:-2;
+  opacity:0;
+  transition: opacity 1.5s ease-in-out;
+  filter: blur(2px);
+}
+.bgDiv.active { opacity:1; }
+
+/* DARK OVERLAY */
+.overlay {
+  position: fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background: rgba(0,0,0,0.35);
+  z-index:-1;
+}
+
+header {
+  background: rgba(255, 77, 109, 0.8);
+  color: white;
+  padding: 20px;
+}
+
+h1,h2 { margin: 10px 0; }
+
+input, select {
+  padding: 10px;
+  margin: 5px;
+  width: 250px;
+}
+
+button {
+  padding: 10px 20px;
+  margin: 5px;
+  background: #ff4d6d;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#authSection, #adminSection, #chatContainer, #privateChatContainer {
+  margin-top: 20px;
+  background: rgba(255, 243, 243, 0.9);
+  padding: 15px;
+  border-radius: 8px;
+  max-width: 600px;
+  margin-left:auto;
+  margin-right:auto;
+  text-align:left;
+  display:none;
+}
+
+#usersList div { margin:5px 0; padding:5px; border-bottom:1px solid #ccc; }
+
+/* WhatsApp style bubbles & animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.bubble {
+  padding:8px;
+  margin:5px 0;
+  max-width:70%;
+  border-radius:15px;
+  word-wrap:break-word;
+  opacity:0;
+  animation: fadeIn 0.5s forwards;
+}
+
+.bubble.self { background:#dcf8c6; text-align:right; margin-left:auto; border-radius:15px 15px 0 15px; }
+.bubble.other { background:#fff; border:1px solid #ccc; text-align:left; margin-right:auto; border-radius:15px 15px 15px 0; }
+
+/* Colors for public messages */
+.bubble.userColor0 { background:#ffebee; color:#c62828; }
+.bubble.userColor1 { background:#e3f2fd; color:#1565c0; }
+.bubble.userColor2 { background:#e8f5e9; color:#2e7d32; }
+.bubble.userColor3 { background:#fff3e0; color:#ef6c00; }
+
+/* Smooth scroll for chat */
+#publicMessages, #privateMessages { scroll-behavior: smooth; }
+
+/* Toast notifications */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #ff4d6d;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s, transform 0.5s;
+  z-index: 9999;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Loading spinner */
+#spinner {
+  display: none;
+  position: fixed;
+  top:50%; left:50%;
+  transform: translate(-50%, -50%);
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #ff4d6d;
+  border-radius: 50%;
+  width: 50px; height: 50px;
+  animation: spin 1s linear infinite;
+  z-index: 9999;
+}
+@keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+
+/* Typing indicator */
+#typingIndicator { color: #555; font-style: italic; margin-top:5px; }
+
+/* Responsive */
+@media (max-width: 600px){
+  input, select, button { width: 90%; font-size: 16px; }
+  #chatContainer, #privateChatContainer { width: 95%; padding: 10px; }
+  .bubble { max-width: 90%; }
+}
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND DIVS -->
+<div id="bg1" class="bgDiv"></div>
+<div id="bg2" class="bgDiv"></div>
+<div class="overlay"></div>
+
+<header>
+  <h1>Clark Online Dating</h1>
+  <p>Created by Darniel Josee</p>
+  <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+</header>
+
+<!-- Spinner -->
+<div id="spinner"></div>
+
+<!-- AUTH -->
+<div id="authSection">
+  <h2>Sign Up / Login</h2>
+  <input type="email" id="email" placeholder="Email"/><br/>
+  <input type="password" id="password" placeholder="Password"/><br/>
+  <input type="text" id="username" placeholder="Username"/><br/>
+  <input type="number" id="age" placeholder="Age"/><br/>
+  <input type="text" id="gender" placeholder="Gender"/><br/>
+  <button onclick="signUp()">Sign Up</button>
+  <button onclick="login()">Login</button>
+</div>
+
+<!-- Logout / Switch Account Buttons -->
+<div style="text-align:center; margin-top:10px;">
+  <button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+  <button id="switchAccountBtn" onclick="showLoginForm()" style="display:none;">Switch Account</button>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="adminSection">
+  <h2>Admin Dashboard</h2>
+  <div id="usersList">Loading users...</div>
+</div>
+
+<!-- PUBLIC CHAT (Admin only) -->
+<div id="chatContainer">
+  <h2>Public Chat Room</h2>
+  <div id="publicMessages" style="height:150px; overflow-y:auto; border:1px solid #ccc; padding:5px; background:white;"></div>
+  <input type="text" id="publicMessageInput" placeholder="Write a message..." style="width:80%"/>
+  <button onclick="sendPublicMessage()">Send</button>
+</div>
+
+<!-- PRIVATE CHAT -->
+<div id="privateChatContainer">
+  <h2>Private Chat Room</h2>
+  <div id="privateMessages" style="height:300px; overflow-y:auto; padding:10px; background:white; border:1px solid #ccc; border-radius:8px;"></div>
+  <p id="typingIndicator"></p>
+  <select id="privateChatUserSelect" style="width:100%; padding:8px; margin:5px 0;"></select>
+  <input type="text" id="privateMessageInput" placeholder="Write a private message..." style="width:80%; padding:8px; margin-top:5px;"/>
+  <button onclick="sendPrivateMessage()">Send</button>
+</div>
+
+<!-- Toast container is dynamic, JS adds it -->
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, getDocs, setDoc, doc, addDoc, query, orderBy, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyDuAZOFqpyZoSH1FlbZ1G7O8YcNX63yDtM",
+  authDomain: "clark-online-dating.firebaseapp.com",
+  projectId: "clark-online-dating",
+  storageBucket: "clark-online-dating.firebasestorage.app",
+  messagingSenderId: "63074718758",
+  appId: "1:63074718758:web:6af5283a9cdbbc1cef82e7",
+  measurementId: "G-5NLJTXQMPY"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const authSection = document.getElementById("authSection");
+const adminSection = document.getElementById("adminSection");
+const chatContainer = document.getElementById("chatContainer");
+const privateChatContainer = document.getElementById("privateChatContainer");
+const usersList = document.getElementById("usersList");
+const logoutBtn = document.getElementById("logoutBtn");
+const switchAccountBtn = document.getElementById("switchAccountBtn");
+const spinner = document.getElementById("spinner");
+const typingIndicator = document.getElementById("typingIndicator");
+
+let currentUser = null;
+let selectedChatUserId = null;
+let privateMessagesUnsub = null;
+let publicMessagesUnsub = null;
+
+// ---------------
+// Helper functions
+// ---------------
+function showToast(msg){
+  const toast = document.createElement("div");
+  toast.className="toast";
+  toast.innerText=msg;
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.classList.add("show"),10);
+  setTimeout(()=>{
+    toast.classList.remove("show");
+    setTimeout(()=>document.body.removeChild(toast),500);
+  },3000);
+}
+
+function toggleDarkMode(){ document.body.classList.toggle("dark"); }
+
+// --------------------
+// AUTH FUNCTIONS
+// --------------------
+window.signUp = async function() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const username = document.getElementById("username").value.trim();
+  const age = document.getElementById("age").value.trim();
+  const gender = document.getElementById("gender").value.trim();
+  if(!email||!password||!username||!age||!gender){showToast("Tafadhali jaza fomu yote."); return;}
+  spinner.style.display="block";
+  try{
+    const userCredential = await createUserWithEmailAndPassword(auth,email,password);
+    const uid = userCredential.user.uid;
+    await setDoc(doc(db,"users",uid),{
+      email,username,age,gender,role:"user",
+      profilePhoto:"https://via.placeholder.com/100",
+      bio:"Nijulishe kidogo..."
+    });
+    showToast("Akaunti imeundwa!");
+  }catch(e){showToast(e.message);}
+  spinner.style.display="none";
+};
+
+window.login = async function() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  if(!email||!password){showToast("Ingiza email na password."); return;}
+  spinner.style.display="block";
+  try{ await signInWithEmailAndPassword(auth,email,password); showToast("Umeingia kwa mafanikio!"); }
+  catch(e){ showToast(e.message); }
+  spinner.style.display="none";
+};
+
+window.logout = async function() {
+  try{ await signOut(auth); showLoginForm(); showToast("Umetoka kwenye akaunti."); }
+  catch(e){showToast(e.message);}
+};
+
+window.showLoginForm = function() {
+  authSection.style.display="block";
+  adminSection.style.display="none";
+  chatContainer.style.display="none";
+  privateChatContainer.style.display="none";
+  logoutBtn.style.display="none";
+  switchAccountBtn.style.display="none";
+};
+
+// --------------------
+// ADMIN & CHAT FUNCTIONS
+// --------------------
+async function loadUsers(){
+  usersList.innerHTML="";
+  const snap = await getDocs(collection(db,"users"));
+  snap.forEach(docSnap=>{
+    const u = docSnap.data();
+    const div = document.createElement("div");
+    div.innerText = `${u.username||"undefined"} | ${u.email} | ${u.gender||"undef"} | ${u.age||"undef"} | ${u.role}`;
+    usersList.appendChild(div);
+  });
+}
+
+function getColorClassForUser(username){
+  const colors = ["userColor0","userColor1","userColor2","userColor3"];
+  let hash = 0;
+  for(let i=0;i<username.length;i++){ hash += username.charCodeAt(i); }
+  return colors[hash % colors.length];
+}
+
+function loadPublicMessages(){
+  const div = document.getElementById("publicMessages");
+  if(publicMessagesUnsub) publicMessagesUnsub();
+  const q = query(collection(db,"publicMessages"), orderBy("timestamp"));
+  publicMessagesUnsub = onSnapshot(q, snap => {
+    div.innerHTML = "";
+    snap.forEach(doc => {
+      const msg = doc.data();
+      const b = document.createElement("div");
+      b.textContent = `${msg.username}: ${msg.message}`;
+      if(msg.username === currentUser.username){ b.classList.add("bubble","self"); }
+      else { b.classList.add("bubble","other",getColorClassForUser(msg.username)); }
+      div.appendChild(b);
+    });
+    div.scrollTop = div.scrollHeight;
+  });
+}
+
+function loadPrivateMessagesForUserPair(u1,u2){
+  const div = document.getElementById("privateMessages");
+  if(privateMessagesUnsub) privateMessagesUnsub();
+  const q = query(collection(db,"privateMessages"), orderBy("timestamp"));
+  privateMessagesUnsub = onSnapshot(q, snap => {
+    div.innerHTML = "";
+    snap.forEach(doc => {
+      const msg = doc.data();
+      if(msg.participants.includes(u1) && msg.participants.includes(u2)){
+        const b = document.createElement("div");
+        b.textContent = `${msg.fromUsername}: ${msg.message}`;
+        b.classList.add("bubble", msg.fromUid===currentUser.uid?"self":"other");
+        div.appendChild(b);
+      }
+    });
+    div.scrollTop = div.scrollHeight;
+  });
+}
+
+// --------------------
+// SEND MESSAGES
+// --------------------
+window.sendPublicMessage = async function(){
+  const msg = document.getElementById("publicMessageInput").value.trim();
+  if(!msg) return;
+  await addDoc(collection(db,"publicMessages"), {
+    username: currentUser.username,
+    message: msg,
+    timestamp: Date.now()
+  });
+  document.getElementById("publicMessageInput").value = "";
+}
+
+window.sendPrivateMessage = async function(){
+  const msg = document.getElementById("privateMessageInput").value.trim();
+  if(!msg) return;
+  if(!selectedChatUserId){ showToast("Chagua user."); return; }
+  const participants = [currentUser.uid, selectedChatUserId];
+  await addDoc(collection(db,"privateMessages"),{
+    fromUid: currentUser.uid,
+    fromUsername: currentUser.username,
+    participants,
+    message: msg,
+    timestamp: Date.now()
+  });
+  document.getElementById("privateMessageInput").value="";
+}
+
+// --------------------
+// AUTH STATE LISTENER
+// --------------------
+onAuthStateChanged(auth,async user=>{
+  if(user){
+    const uDoc = await getDoc(doc(db,"users",user.uid));
+    currentUser = {uid:user.uid,...uDoc.data()};
+    authSection.style.display="none";
+    logoutBtn.style.display="inline-block";
+    switchAccountBtn.style.display="inline-block";
+
+    if(currentUser.role==="admin"){
+      adminSection.style.display="block";
+      chatContainer.style.display="block";
+      privateChatContainer.style.display="block";
+      loadUsers(); 
+      loadPublicMessages();
+    } else {
+      adminSection.style.display="none";
+      chatContainer.style.display="none";
+      privateChatContainer.style.display="block";
+      const select = document.getElementById("privateChatUserSelect");
+      select.innerHTML="";
+      const snap = await getDocs(collection(db,"users"));
+      snap.forEach(docSnap=>{
+        if(docSnap.id!==currentUser.uid){
+          const u = docSnap.data();
+          const opt = document.createElement("option");
+          opt.value = docSnap.id;
+          opt.textContent = u.username||u.email||"Unnamed";
+          select.appendChild(opt);
+        }
+      });
+      if(select.options.length>0){
+        selectedChatUserId = select.options[0].value;
+        loadPrivateMessagesForUserPair(currentUser.uid,selectedChatUserId);
+      }
+      select.onchange = ()=>{ selectedChatUserId = select.value; loadPrivateMessagesForUserPair(currentUser.uid,selectedChatUserId); }
+
+      // Typing indicator listener (simple)
+      inputTypingListener();
+    }
+  } else { currentUser = null; showLoginForm(); }
+});
+
+// --------------------
+// TYPING INDICATOR SIMPLE SIMULATION
+// --------------------
+function inputTypingListener(){
+  const input = document.getElementById("privateMessageInput");
+  input.addEventListener("input", ()=>{
+    typingIndicator.innerText = currentUser.username + " is typing...";
+    clearTimeout(window.typingTimeout);
+    window.typingTimeout = setTimeout(()=>{ typingIndicator.innerText=""; },1500);
+  });
+}
+
+// --------------------
+// BACKGROUND CROSSFADE
+// --------------------
+const bgImages = [
+  "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg",
+  "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg",
+  "https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg",
+  "https://images.pexels.com/photos/3769713/pexels-photo-3769713.jpeg"
+];
+let bgIndex = 0;
+let currentDiv = 1;
+function crossfadeBackground(){
+  const div1 = document.getElementById("bg1");
+  const div2 = document.getElementById("bg2");
+  const nextImage = bgImages[bgIndex];
+  bgIndex = (bgIndex +1) % bgImages.length;
+  if(currentDiv===1){
+    div2.style.backgroundImage = `url('${nextImage}')`;
+    div2.classList.add("active");
+    div1.classList.remove("active");
+    currentDiv = 2;
+  } else {
+    div1.style.backgroundImage = `url('${nextImage}')`;
+    div1.classList.add("active");
+    div2.classList.remove("active");
+    currentDiv = 1;
+  }
+}
+crossfadeBackground();
+setInterval(crossfadeBackground,5000);
+
+</script>
+</body>
+</html>
