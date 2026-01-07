@@ -17,12 +17,12 @@
 /* BODY na BACKGROUND */
 body {
   position: relative;
-  color: #333;
+  color: #fff;
   overflow-x: hidden;
 }
 
 /* BACKGROUND SLIDESHOW */
-#bg1, #bg2 {
+.bg-slide {
   position: fixed;
   top:0;
   left:0;
@@ -33,11 +33,6 @@ body {
   z-index: -2;
   opacity: 0;
   transition: opacity 2s ease-in-out;
-}
-
-/* INITIAL BACKGROUND VISIBLE */
-#bg1 {
-  opacity: 1;
 }
 
 /* OVERLAY */
@@ -55,7 +50,7 @@ body {
 header {
   position: relative;
   z-index:1;
-  background: #fff;
+  background: rgba(255,255,255,0.9);
   padding: 15px 30px;
   display: flex;
   justify-content: space-between;
@@ -80,7 +75,6 @@ nav a:hover { color: #ff5f6d; }
   z-index:1;
   text-align: center;
   padding: 80px 20px;
-  color: white;
 }
 
 .hero h2 { font-size: 40px; margin-bottom: 15px; }
@@ -104,7 +98,7 @@ nav a:hover { color: #ff5f6d; }
 .features {
   position: relative;
   z-index:1;
-  background: #fff;
+  background: rgba(255,255,255,0.9);
   padding: 60px 20px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -160,10 +154,10 @@ footer {
 
 <body>
 
-<!-- BACKGROUND DIVS -->
-<div id="bg1" style="background-image: url('https://share.google/zEIpWgqdMGMZuRgW3');"></div>
-<div id="bg2" style="background-image: url('https://share.google/cUpzwnjk5dXTEjnqw');"></div>
-<div id="bg3" style="background-image: url('https://share.google/z1ZM9tEPNWOJMWKRi'); position: fixed; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; z-index:-2; opacity:0; transition: opacity 2s ease-in-out;"></div>
+<!-- BACKGROUND SLIDES -->
+<div id="bg1" class="bg-slide" style="background-image: url('https://share.google/zEIpWgqdMGMZuRgW3'); opacity:1;"></div>
+<div id="bg2" class="bg-slide" style="background-image: url('https://share.google/cUpzwnjk5dXTEjnqw');"></div>
+<div id="bg3" class="bg-slide" style="background-image: url('https://share.google/z1ZM9tEPNWOJMWKRi');"></div>
 
 <!-- OVERLAY -->
 <div id="overlay"></div>
@@ -215,20 +209,31 @@ function joinNow(){
   alert("Hapa utaunganisha ukurasa wa Sign Up 🔐");
 }
 
-// BACKGROUND FADE EFFECT
-let backgrounds = [
+// BACKGROUND SLIDESHOW WITH RANDOM ORDER AND CONTINUOUS FADE
+let bgSlides = [
   document.getElementById("bg1"),
   document.getElementById("bg2"),
   document.getElementById("bg3")
 ];
 
-let current = 0;
+let currentIndex = 0;
+
+// Function to get next random index not equal current
+function getNextIndex(){
+  let next;
+  do {
+    next = Math.floor(Math.random() * bgSlides.length);
+  } while(next === currentIndex);
+  return next;
+}
+
+// Start slideshow
 setInterval(()=>{
-  let next = (current + 1) % backgrounds.length;
-  backgrounds[current].style.opacity = 0;
-  backgrounds[next].style.opacity = 1;
-  current = next;
-}, 5000); // badilisha kila 5 sekunde
+  let nextIndex = getNextIndex();
+  bgSlides[currentIndex].style.opacity = 0;
+  bgSlides[nextIndex].style.opacity = 1;
+  currentIndex = nextIndex;
+}, 5000); // change every 5 seconds
 </script>
 
 </body>
