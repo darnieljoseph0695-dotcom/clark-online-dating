@@ -6,148 +6,146 @@
 <title>Clark Online Dating</title>
 
 <style>
-/* RESET */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Arial, sans-serif;
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI', Arial, sans-serif;
 }
 
-/* BODY na BACKGROUND */
 body {
-  position: relative;
-  color: #fff;
-  overflow-x: hidden;
+  position:relative;
+  color:#fff;
+  overflow-x:hidden;
 }
 
-/* BACKGROUND SLIDESHOW */
+/* BACKGROUND SLIDES */
 .bg-slide {
-  position: fixed;
+  position:fixed;
   top:0;
   left:0;
   width:100%;
   height:100%;
-  background-size: cover;
-  background-position: center;
-  z-index: -2;
-  opacity: 0;
-  transition: opacity 2s ease-in-out;
+  background-size:cover;
+  background-position:center;
+  z-index:-2;
+  opacity:0;
+  transition:opacity 2s ease-in-out;
 }
 
-/* OVERLAY ili text ionekane vizuri */
+/* OVERLAY */
 #overlay {
-  position: fixed;
+  position:fixed;
   top:0;
   left:0;
   width:100%;
   height:100%;
-  background-color: rgba(0,0,0,0.25);
-  z-index: -1;
+  background-color: rgba(0,0,0,0.3);
+  z-index:-1;
 }
 
 /* HEADER */
 header {
-  position: relative;
+  position:relative;
   z-index:1;
   background: rgba(255,255,255,0.9);
   padding: 15px 30px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 3px 10px rgba(0,0,0,0.1);
 }
 
 header h1 { color: #ff5f6d; }
 
 nav a {
-  margin-left: 15px;
-  text-decoration: none;
-  color: #333;
-  font-weight: bold;
+  margin-left:15px;
+  text-decoration:none;
+  color:#333;
+  font-weight:bold;
 }
 
-nav a:hover { color: #ff5f6d; }
+nav a:hover { color:#ff5f6d; }
 
 /* HERO */
 .hero {
-  position: relative;
+  position:relative;
   z-index:1;
-  text-align: center;
-  padding: 80px 20px;
+  text-align:center;
+  padding:80px 20px;
 }
 
-.hero h2 { font-size: 40px; margin-bottom: 15px; }
+.hero h2 { font-size:40px; margin-bottom:15px; }
 
-.hero p { font-size: 18px; margin-bottom: 30px; }
+.hero p { font-size:18px; margin-bottom:30px; }
 
 .hero button {
-  background: white;
-  color: #ff5f6d;
-  border: none;
-  padding: 15px 35px;
-  font-size: 18px;
-  border-radius: 30px;
-  cursor: pointer;
-  font-weight: bold;
+  background:white;
+  color:#ff5f6d;
+  border:none;
+  padding:15px 35px;
+  font-size:18px;
+  border-radius:30px;
+  cursor:pointer;
+  font-weight:bold;
 }
 
-.hero button:hover { background: #ffe1e4; }
+.hero button:hover { background:#ffe1e4; }
 
 /* FEATURES */
 .features {
-  position: relative;
+  position:relative;
   z-index:1;
   background: rgba(255,255,255,0.9);
-  padding: 60px 20px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+  padding:60px 20px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(250px,1fr));
+  gap:20px;
 }
 
 .feature-box {
-  background: #fafafa;
-  padding: 30px;
-  text-align: center;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  background:#fafafa;
+  padding:30px;
+  text-align:center;
+  border-radius:15px;
+  box-shadow:0 4px 15px rgba(0,0,0,0.08);
 }
 
-.feature-box h3 { color: #ff5f6d; margin-bottom: 10px; }
+.feature-box h3 { color:#ff5f6d; margin-bottom:10px; }
 
 /* CTA */
 .cta {
-  position: relative;
+  position:relative;
   z-index:1;
-  text-align: center;
-  padding: 70px 20px;
-  background: #ff5f6d;
-  color: white;
+  text-align:center;
+  padding:70px 20px;
+  background:#ff5f6d;
+  color:white;
 }
 
 .cta button {
-  margin-top: 20px;
-  padding: 14px 30px;
-  border: none;
-  border-radius: 25px;
-  font-size: 17px;
-  cursor: pointer;
-  font-weight: bold;
+  margin-top:20px;
+  padding:14px 30px;
+  border:none;
+  border-radius:25px;
+  font-size:17px;
+  cursor:pointer;
+  font-weight:bold;
 }
 
 /* FOOTER */
 footer {
-  position: relative;
+  position:relative;
   z-index:1;
-  background: #222;
-  color: #aaa;
-  text-align: center;
-  padding: 20px;
+  background:#222;
+  color:#aaa;
+  text-align:center;
+  padding:20px;
 }
 
 /* RESPONSIVE */
 @media(max-width:600px){
-  .hero h2 { font-size: 28px; }
+  .hero h2 { font-size:28px; }
 }
 </style>
 </head>
@@ -155,11 +153,10 @@ footer {
 <body>
 
 <!-- BACKGROUND SLIDES -->
-<div id="bg1" class="bg-slide" style="background-image: url('https://raw.githubusercontent.com/darnieljoseph0695-dotcom/clark-online-dating/main/images/bg1.jpg'); opacity:1;"></div>
-<div id="bg2" class="bg-slide" style="background-image: url('https://raw.githubusercontent.com/darnieljoseph0695-dotcom/clark-online-dating/main/images/bg2.jpg');"></div>
-<div id="bg3" class="bg-slide" style="background-image: url('https://raw.githubusercontent.com/darnieljoseph0695-dotcom/clark-online-dating/main/images/bg3.jpg');"></div>
+<div id="bg1" class="bg-slide" style="background-image:url('https://raw.githubusercontent.com/darnieljoseph0695-dotcom/clark-online-dating/main/images/girl1.jpg'); opacity:1;"></div>
+<div id="bg2" class="bg-slide" style="background-image:url('https://raw.githubusercontent.com/darnieljoseph0695-dotcom/clark-online-dating/main/images/girl2.jpg');"></div>
+<div id="bg3" class="bg-slide" style="background-image:url('https://raw.githubusercontent.com/darnieljoseph0695-dotcom/clark-online-dating/main/images/love_wall1.jpg');"></div>
 
-<!-- OVERLAY -->
 <div id="overlay"></div>
 
 <header>
@@ -201,7 +198,7 @@ footer {
 </section>
 
 <footer>
-  <p>© 2026 Clark Online Dating | All created by Darniel josee</p>
+  <p>© 2026 Clark Online Dating | All Rights Reserved</p>
 </footer>
 
 <script>
@@ -209,7 +206,7 @@ function joinNow(){
   alert("Hapa utaunganisha ukurasa wa Sign Up 🔐");
 }
 
-// BACKGROUND SLIDESHOW
+// SLIDESHOW
 let bgSlides = [
   document.getElementById("bg1"),
   document.getElementById("bg2"),
@@ -218,20 +215,15 @@ let bgSlides = [
 
 let currentIndex = 0;
 
-function getNextIndex(){
-  let next;
-  do {
-    next = Math.floor(Math.random() * bgSlides.length);
-  } while(next === currentIndex);
-  return next;
-}
-
 setInterval(()=>{
-  let nextIndex = getNextIndex();
-  bgSlides[currentIndex].style.opacity = 0;
-  bgSlides[nextIndex].style.opacity = 1;
-  currentIndex = nextIndex;
-}, 5000); // badilisha kila 5 seconds
+  let nextIndex;
+  do { nextIndex = Math.floor(Math.random()*bgSlides.length); } 
+  while(nextIndex===currentIndex);
+
+  bgSlides[currentIndex].style.opacity=0;
+  bgSlides[nextIndex].style.opacity=1;
+  currentIndex=nextIndex;
+},5000);
 </script>
 
 </body>
