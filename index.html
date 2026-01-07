@@ -35,7 +35,7 @@ body {
   transition: opacity 2s ease-in-out;
 }
 
-/* OVERLAY */
+/* OVERLAY ili text ionekane vizuri */
 #overlay {
   position: fixed;
   top:0;
@@ -155,9 +155,9 @@ footer {
 <body>
 
 <!-- BACKGROUND SLIDES -->
-<div id="bg1" class="bg-slide" style="background-image: url('https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPO/main/images/bg1.jpg'); opacity:1;"></div>
-<div id="bg2" class="bg-slide" style="background-image: url('https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPO/main/images/bg2.jpg');"></div>
-<div id="bg3" class="bg-slide" style="background-image: url('https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPO/main/images/bg3.jpg');"></div>
+<div id="bg1" class="bg-slide" style="background-image: url('https://raw.githubusercontent.com/darnieljoseph0695-dotcom/clark-online-dating/main/images/bg1.jpg'); opacity:1;"></div>
+<div id="bg2" class="bg-slide" style="background-image: url('https://raw.githubusercontent.com/darnieljoseph0695-dotcom/clark-online-dating/main/images/bg2.jpg');"></div>
+<div id="bg3" class="bg-slide" style="background-image: url('https://raw.githubusercontent.com/darnieljoseph0695-dotcom/clark-online-dating/main/images/bg3.jpg');"></div>
 
 <!-- OVERLAY -->
 <div id="overlay"></div>
@@ -201,7 +201,7 @@ footer {
 </section>
 
 <footer>
-  <p>© 2026 Clark Online Dating | All Rights Reserved</p>
+  <p>© 2026 Clark Online Dating | All created by Darniel josee</p>
 </footer>
 
 <script>
@@ -218,7 +218,6 @@ let bgSlides = [
 
 let currentIndex = 0;
 
-// Function to get next random index not equal current
 function getNextIndex(){
   let next;
   do {
@@ -227,13 +226,12 @@ function getNextIndex(){
   return next;
 }
 
-// Start slideshow
 setInterval(()=>{
   let nextIndex = getNextIndex();
   bgSlides[currentIndex].style.opacity = 0;
   bgSlides[nextIndex].style.opacity = 1;
   currentIndex = nextIndex;
-}, 5000); // change every 5 seconds
+}, 5000); // badilisha kila 5 seconds
 </script>
 
 </body>
