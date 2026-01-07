@@ -1,16 +1,57 @@
 <!DOCTYPE html>
-<html>
-<head><title>Login</title></head>
-<body>
-<h2>Login</h2>
-<input id="email" placeholder="Email"><br>
-<input id="password" type="password"><br>
-<button onclick="login()">Login</button>
+<html lang="sw">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login | Clark</title>
 
-<script>
-function login(){
- alert("Firebase itaunganishwa hapa");
+<style>
+body{
+ background:linear-gradient(120deg,#ff5f6d,#ffc371);
+ font-family:Arial;
+ height:100vh;
+ display:flex;
+ justify-content:center;
+ align-items:center;
 }
-</script>
+
+.card{
+ background:white;
+ padding:30px;
+ width:300px;
+ border-radius:15px;
+ text-align:center;
+ box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
+
+input{
+ width:100%;
+ padding:12px;
+ margin:10px 0;
+ border-radius:8px;
+ border:1px solid #ccc;
+}
+
+button{
+ width:100%;
+ padding:12px;
+ background:#ff5f6d;
+ color:white;
+ border:none;
+ border-radius:20px;
+ font-size:16px;
+ cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+<div class="card">
+<h2>🔐 Login</h2>
+<input placeholder="Email">
+<input type="password" placeholder="Password">
+<button>Login</button>
+<p><a href="signup.html">Create Account</a></p>
+</div>
 </body>
 </html>
