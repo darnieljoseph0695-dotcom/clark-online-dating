@@ -23,7 +23,7 @@ body{
 .user{
   display:flex;
   align-items:center;
-  padding:10px;
+  padding:12px;
   cursor:pointer;
   border-bottom:1px solid #333;
 }
@@ -31,6 +31,7 @@ body{
   width:45px;
   height:45px;
   border-radius:50%;
+  object-fit:cover;
   margin-right:10px;
 }
 .user:hover{background:#222}
@@ -47,6 +48,7 @@ body{
   background:#ff5f6d;
   color:white;
   padding:15px;
+  font-weight:bold;
 }
 .messages{
   flex:1;
@@ -54,37 +56,51 @@ body{
   overflow-y:auto;
 }
 .msg{
-  max-width:60%;
-  padding:10px;
+  max-width:65%;
+  padding:10px 14px;
   margin:8px 0;
-  border-radius:12px;
+  border-radius:15px;
+  font-size:14px;
 }
-.me{background:#ff5f6d;color:white;margin-left:auto;}
-.other{background:#eee;color:black;}
+.me{
+  background:#ff5f6d;
+  color:white;
+  margin-left:auto;
+}
+.other{
+  background:rgba(255,255,255,0.9);
+  color:black;
+}
 
+/* INPUT */
 .input{
   display:flex;
+  background:white;
 }
 .input input{
   flex:1;
   padding:12px;
   border:none;
+  outline:none;
 }
 .input button{
   padding:12px 20px;
   background:#ff5f6d;
   color:white;
   border:none;
+  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
+<!-- USERS -->
 <div class="users" id="users"></div>
 
+<!-- CHAT -->
 <div class="chat" id="chatBox">
-  <div class="header" id="chatName">Select user</div>
+  <div class="header" id="chatName">Select a user</div>
   <div class="messages" id="messages"></div>
   <div class="input">
     <input id="msg" placeholder="Type message...">
@@ -113,64 +129,86 @@ const db = firebase.database();
 
 let currentChat = null;
 
-/* BACKGROUND ROTATION */
+/* BACKGROUND ZA WADADA (AUTO CHANGE) */
 const backgrounds = [
-  "https://i.imgur.com/3ZQ3ZQF.jpg",
-  "https://i.imgur.com/qIufhof.jpg",
-  "https://i.imgur.com/l49aYS3.jpg"
+  "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+  "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e",
+  "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c",
+  "https://images.unsplash.com/photo-1517841905240-472988babdf9"
 ];
+
 let bgIndex = 0;
 setInterval(()=>{
   document.getElementById("chatBox").style.backgroundImage =
     `url(${backgrounds[bgIndex]})`;
-  bgIndex = (bgIndex+1)%backgrounds.length;
-}, 8000);
+  bgIndex = (bgIndex + 1) % backgrounds.length;
+}, 7000);
 
 /* LOAD USERS */
 auth.onAuthStateChanged(user=>{
-  if(!user){ location.href="login.html"; return; }
+  if(!user){
+    location.href="login.html";
+    return;
+  }
 
   db.ref("users").on("child_added",snap=>{
     if(snap.key === user.uid) return;
+
     const u = snap.val();
+    const name = u.name || "Anonymous";
+    const photo = u.photo || "https://i.imgur.com/1X6sK5C.png";
+
     const div = document.createElement("div");
     div.className="user";
-    div.innerHTML = `<img src="${u.photo}"><div>${u.name}</div>`;
-    div.onclick=()=>openChat(snap.key,u.name);
+    div.innerHTML = `
+      <img src="${photo}">
+      <div>${name}</div>
+    `;
+    div.onclick = ()=>openChat(snap.key, name);
     document.getElementById("users").appendChild(div);
   });
 });
 
+/* OPEN CHAT */
 function openChat(uid,name){
   currentChat = uid;
   document.getElementById("chatName").innerText = name;
-  document.getElementById("messages").innerHTML="";
+  document.getElementById("messages").innerHTML = "";
 
-  db.ref("chats").child(getChatId(uid)).off();
-  db.ref("chats").child(getChatId(uid)).on("child_added",snap=>{
+  const chatId = getChatId(uid);
+  db.ref("chats/"+chatId).off();
+  db.ref("chats/"+chatId).on("child_added",snap=>{
     const m = snap.val();
     const div = document.createElement("div");
-    div.className="msg " + (m.from === auth.currentUser.uid ? "me":"other");
+    div.className = "msg " + (m.from === auth.currentUser.uid ? "me":"other");
     div.innerText = m.text;
     document.getElementById("messages").appendChild(div);
   });
 }
 
+/* SEND MESSAGE */
 function send(){
-  if(!currentChat) return alert("Select user");
-  const text = msg.value;
+  if(!currentChat){
+    alert("Select a user first");
+    return;
+  }
+  const text = msg.value.trim();
+  if(text==="") return;
   msg.value="";
-  db.ref("chats").child(getChatId(currentChat)).push({
+
+  db.ref("chats/"+getChatId(currentChat)).push({
     from: auth.currentUser.uid,
-    text
+    text: text
   });
 }
 
+/* CHAT ID */
 function getChatId(uid){
   return auth.currentUser.uid < uid
-    ? auth.currentUser.uid+"_"+uid
-    : uid+"_"+auth.currentUser.uid;
+    ? auth.currentUser.uid + "_" + uid
+    : uid + "_" + auth.currentUser.uid;
 }
 </script>
+
 </body>
 </html>
