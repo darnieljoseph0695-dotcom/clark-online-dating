@@ -16,7 +16,7 @@ body{
   background:#111;
 }
 
-/* CHAT CONTAINER WASTANI */
+/* CHAT CONTAINER */
 #chatContainer{
   display:flex;
   width:900px;
@@ -29,7 +29,7 @@ body{
   position:relative;
 }
 
-/* OVERLAY YA TRANSPARENT */
+/* TRANSPARENT OVERLAY */
 #overlay{
   position:absolute;
   top:0;
@@ -143,13 +143,13 @@ body{
 <body>
 
 <div id="chatContainer">
-  <!-- Dynamic Background overlay -->
+  <!-- Overlay -->
   <div id="overlay"></div>
 
-  <!-- USERS -->
+  <!-- USERS SIDEBAR -->
   <div class="users" id="users"></div>
 
-  <!-- CHAT -->
+  <!-- CHAT AREA -->
   <div class="chat" id="chatBox">
     <div class="header" id="chatName">Select a user</div>
     <div class="messages" id="messages"></div>
@@ -181,11 +181,11 @@ const auth = firebase.auth();
 const db = firebase.database();
 let currentChat = null;
 
-/* BACKGROUND ZA CHAT AREA (PLACEHOLDER) */
+/* BACKGROUND IMAGES */
 const backgrounds = [
-  "https://i.imgur.com/abc123.png", // replace na direct link ya first image
-  "https://i.imgur.com/def456.png", // replace na second
-  "https://i.imgur.com/ghi789.png"  // replace na third
+  "https://i.imgur.com/abc123.png", // replace na direct image link yako
+  "https://i.imgur.com/def456.png",
+  "https://i.imgur.com/ghi789.png"
 ];
 let bgIndex = 0;
 setInterval(()=>{
@@ -196,7 +196,7 @@ setInterval(()=>{
   bgIndex = (bgIndex + 1) % backgrounds.length;
 }, 10000);
 
-/* LOAD USERS */
+/* LOAD ALL USERS WALI OPO FIREBASE */
 auth.onAuthStateChanged(user=>{
   if(!user){
     location.href="login.html";
@@ -204,18 +204,21 @@ auth.onAuthStateChanged(user=>{
   }
 
   const usersRef = db.ref("users");
-  usersRef.on("child_added",snap=>{
-    if(snap.key === user.uid) return;
+  usersRef.on("value", snapshot => { // <-- important change hapa
+    const usersContainer = document.getElementById("users");
+    usersContainer.innerHTML = ""; // clear old list
+    snapshot.forEach(snap => {
+      if(snap.key === auth.currentUser.uid) return;
+      const u = snap.val();
+      const name = u.name || "Anonymous";
+      const photo = u.photo || "https://i.imgur.com/1X6sK5C.png";
 
-    const u = snap.val();
-    const name = u.name || "Anonymous";
-    const photo = u.photo || "https://i.imgur.com/1X6sK5C.png";
-
-    const div = document.createElement("div");
-    div.className="user";
-    div.innerHTML = `<img src="${photo}"><div>${name}</div>`;
-    div.onclick = ()=>openChat(snap.key, name);
-    document.getElementById("users").appendChild(div);
+      const div = document.createElement("div");
+      div.className = "user";
+      div.innerHTML = `<img src="${photo}"><div>${name}</div>`;
+      div.onclick = ()=>openChat(snap.key, name);
+      usersContainer.appendChild(div);
+    });
   });
 });
 
