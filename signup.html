@@ -48,10 +48,64 @@ button{
 <body>
 <div class="card">
 <h2>❤️ Create Account</h2>
-<input placeholder="Email">
-<input type="password" placeholder="Password">
-<button>Sign Up</button>
+<!-- 🔑 Add IDs for JS -->
+<input id="name" placeholder="Full Name">
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<button id="signupBtn">Sign Up</button>
 <p><a href="login.html">Already have account?</a></p>
 </div>
+
+<!-- 🔥 FIREBASE COMPAT -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+// Firebase Init – only once
+if (!firebase.apps.length) {
+  firebase.initializeApp({
+    apiKey: "AIzaSyDuAZOFqpyZoSH1FlbZ1G7O8YcNX63yDtM",
+    authDomain: "clark-online-dating.firebaseapp.com",
+    projectId: "clark-online-dating",
+    storageBucket: "clark-online-dating.firebasestorage.app",
+    messagingSenderId: "63074718758",
+    appId: "1:63074718758:web:6af5283a9cdbbc1cef82e7"
+  });
+}
+
+const auth = firebase.auth();
+const db   = firebase.database();
+
+// Signup Function
+document.getElementById("signupBtn").addEventListener("click", function(){
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if(!name || !email || !password){
+    alert("Please fill all fields");
+    return;
+  }
+
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(cred => {
+      // Save profile in DB
+      return db.ref("users/" + cred.user.uid).set({
+        name: name,
+        photo: "https://i.imgur.com/1X6sK5C.png",
+        createdAt: Date.now()
+      });
+    })
+    .then(() => {
+      alert("Account created successfully");
+      window.location.href = "chat.html"; // redirect to chat
+    })
+    .catch(err => {
+      alert("SIGN UP ERROR: " + err.message);
+      console.error(err);
+    });
+});
+</script>
 </body>
 </html>
