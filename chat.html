@@ -36,14 +36,14 @@ body{
   left:0;
   width:100%;
   height:100%;
-  background-color:rgba(0,0,0,0.35); /* transparency for readability */
+  background-color:rgba(0,0,0,0.25); /* transparency for readability */
   z-index:1;
 }
 
 /* USERS LIST */
 .users{
   width:250px;
-  background:rgba(0,0,0,0.5); /* transparent so background shows through */
+  background:rgba(0,0,0,0.7); /* dark sidebar */
   color:white;
   overflow-y:auto;
   padding:10px;
@@ -75,6 +75,8 @@ body{
   flex-direction:column;
   position:relative;
   z-index:2;
+  background-size:cover;
+  background-position:center;
 }
 .header{
   background:rgba(255,95,109,0.8);
@@ -164,7 +166,7 @@ body{
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-// Firebase Config (unchanged)
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyDuAZOFqpyZoSH1FlbZ1G7O8YcNX63yDtM",
   authDomain: "clark-online-dating.firebaseapp.com",
@@ -179,12 +181,11 @@ const auth = firebase.auth();
 const db = firebase.database();
 let currentChat = null;
 
-/* DYNAMIC BACKGROUND */
+/* BACKGROUND ZA CHAT AREA (PLACEHOLDER) */
 const backgrounds = [
-  "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-  "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e",
-  "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c",
-  "https://images.unsplash.com/photo-1517841905240-472988babdf9"
+  "https://i.imgur.com/abc123.png", // replace na direct link ya first image
+  "https://i.imgur.com/def456.png", // replace na second
+  "https://i.imgur.com/ghi789.png"  // replace na third
 ];
 let bgIndex = 0;
 setInterval(()=>{
