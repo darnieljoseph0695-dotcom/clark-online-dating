@@ -3,71 +3,174 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chat | Clark</title>
+<title>Clark Chat</title>
 
 <style>
 body{
- font-family:Arial;
- background:#f5f5f5;
- display:flex;
- justify-content:center;
- align-items:center;
- height:100vh;
+  margin:0;
+  font-family:Arial;
+  height:100vh;
+  display:flex;
 }
 
-.chat-box{
- width:350px;
- background:white;
- border-radius:15px;
- box-shadow:0 10px 25px rgba(0,0,0,0.2);
- display:flex;
- flex-direction:column;
+/* USERS LIST */
+.users{
+  width:30%;
+  background:#111;
+  color:white;
+  overflow-y:auto;
 }
+.user{
+  display:flex;
+  align-items:center;
+  padding:10px;
+  cursor:pointer;
+  border-bottom:1px solid #333;
+}
+.user img{
+  width:45px;
+  height:45px;
+  border-radius:50%;
+  margin-right:10px;
+}
+.user:hover{background:#222}
 
+/* CHAT AREA */
+.chat{
+  width:70%;
+  display:flex;
+  flex-direction:column;
+  background-size:cover;
+  background-position:center;
+}
 .header{
- background:#ff5f6d;
- color:white;
- padding:15px;
- text-align:center;
- border-radius:15px 15px 0 0;
+  background:#ff5f6d;
+  color:white;
+  padding:15px;
 }
-
 .messages{
- flex:1;
- padding:10px;
- overflow-y:auto;
+  flex:1;
+  padding:15px;
+  overflow-y:auto;
 }
-
-.input-box{
- display:flex;
+.msg{
+  max-width:60%;
+  padding:10px;
+  margin:8px 0;
+  border-radius:12px;
 }
+.me{background:#ff5f6d;color:white;margin-left:auto;}
+.other{background:#eee;color:black;}
 
-input{
- flex:1;
- padding:12px;
- border:none;
- border-top:1px solid #ddd;
+.input{
+  display:flex;
 }
-
-button{
- background:#ff5f6d;
- color:white;
- border:none;
- padding:12px 18px;
+.input input{
+  flex:1;
+  padding:12px;
+  border:none;
+}
+.input button{
+  padding:12px 20px;
+  background:#ff5f6d;
+  color:white;
+  border:none;
 }
 </style>
 </head>
 
 <body>
-<div class="chat-box">
-<div class="header">💬 Clark Chat</div>
-<div class="messages">
-<p><b>Clark:</b> Karibu kwenye chat ❤️</p>
+
+<div class="users" id="users"></div>
+
+<div class="chat" id="chatBox">
+  <div class="header" id="chatName">Select user</div>
+  <div class="messages" id="messages"></div>
+  <div class="input">
+    <input id="msg" placeholder="Type message...">
+    <button onclick="send()">Send</button>
+  </div>
 </div>
-<div class="input-box">
-<input placeholder="Andika ujumbe...">
-<button>Tuma</button>
-</div>
-</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDuAZOFqpyZoSH1FlbZ1G7O8YcNX63yDtM",
+  authDomain: "clark-online-dating.firebaseapp.com",
+  projectId: "clark-online-dating",
+  storageBucket: "clark-online-dating.firebasestorage.app",
+  messagingSenderId: "63074718758",
+  appId: "1:63074718758:web:6af5283a9cdbbc1cef82e7"
+};
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.database();
+
+let currentChat = null;
+
+/* BACKGROUND ROTATION */
+const backgrounds = [
+  "https://i.imgur.com/3ZQ3ZQF.jpg",
+  "https://i.imgur.com/qIufhof.jpg",
+  "https://i.imgur.com/l49aYS3.jpg"
+];
+let bgIndex = 0;
+setInterval(()=>{
+  document.getElementById("chatBox").style.backgroundImage =
+    `url(${backgrounds[bgIndex]})`;
+  bgIndex = (bgIndex+1)%backgrounds.length;
+}, 8000);
+
+/* LOAD USERS */
+auth.onAuthStateChanged(user=>{
+  if(!user){ location.href="login.html"; return; }
+
+  db.ref("users").on("child_added",snap=>{
+    if(snap.key === user.uid) return;
+    const u = snap.val();
+    const div = document.createElement("div");
+    div.className="user";
+    div.innerHTML = `<img src="${u.photo}"><div>${u.name}</div>`;
+    div.onclick=()=>openChat(snap.key,u.name);
+    document.getElementById("users").appendChild(div);
+  });
+});
+
+function openChat(uid,name){
+  currentChat = uid;
+  document.getElementById("chatName").innerText = name;
+  document.getElementById("messages").innerHTML="";
+
+  db.ref("chats").child(getChatId(uid)).off();
+  db.ref("chats").child(getChatId(uid)).on("child_added",snap=>{
+    const m = snap.val();
+    const div = document.createElement("div");
+    div.className="msg " + (m.from === auth.currentUser.uid ? "me":"other");
+    div.innerText = m.text;
+    document.getElementById("messages").appendChild(div);
+  });
+}
+
+function send(){
+  if(!currentChat) return alert("Select user");
+  const text = msg.value;
+  msg.value="";
+  db.ref("chats").child(getChatId(currentChat)).push({
+    from: auth.currentUser.uid,
+    text
+  });
+}
+
+function getChatId(uid){
+  return auth.currentUser.uid < uid
+    ? auth.currentUser.uid+"_"+uid
+    : uid+"_"+auth.currentUser.uid;
+}
+</script>
 </body>
 </html>
