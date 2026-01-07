@@ -16,22 +16,39 @@
 
 /* BODY na BACKGROUND */
 body {
-  background: url("https://share.google/dnRrMCp6xwym0YsNQ") no-repeat center center fixed;
-  background-size: cover;
-  color: #333;
   position: relative;
+  color: #333;
+  overflow-x: hidden;
 }
 
-/* OVERLAY KIDOGO KWA READABILITY */
-body::before {
-  content: "";
-  position: absolute;
+/* BACKGROUND SLIDESHOW */
+#bg1, #bg2 {
+  position: fixed;
   top:0;
   left:0;
   width:100%;
   height:100%;
-  background-color: rgba(0,0,0,0.25); /* adjust transparency */
-  z-index:0;
+  background-size: cover;
+  background-position: center;
+  z-index: -2;
+  opacity: 0;
+  transition: opacity 2s ease-in-out;
+}
+
+/* INITIAL BACKGROUND VISIBLE */
+#bg1 {
+  opacity: 1;
+}
+
+/* OVERLAY */
+#overlay {
+  position: fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background-color: rgba(0,0,0,0.25);
+  z-index: -1;
 }
 
 /* HEADER */
@@ -46,9 +63,7 @@ header {
   box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
 
-header h1 {
-  color: #ff5f6d;
-}
+header h1 { color: #ff5f6d; }
 
 nav a {
   margin-left: 15px;
@@ -57,9 +72,7 @@ nav a {
   font-weight: bold;
 }
 
-nav a:hover {
-  color: #ff5f6d;
-}
+nav a:hover { color: #ff5f6d; }
 
 /* HERO */
 .hero {
@@ -70,15 +83,9 @@ nav a:hover {
   color: white;
 }
 
-.hero h2 {
-  font-size: 40px;
-  margin-bottom: 15px;
-}
+.hero h2 { font-size: 40px; margin-bottom: 15px; }
 
-.hero p {
-  font-size: 18px;
-  margin-bottom: 30px;
-}
+.hero p { font-size: 18px; margin-bottom: 30px; }
 
 .hero button {
   background: white;
@@ -91,9 +98,7 @@ nav a:hover {
   font-weight: bold;
 }
 
-.hero button:hover {
-  background: #ffe1e4;
-}
+.hero button:hover { background: #ffe1e4; }
 
 /* FEATURES */
 .features {
@@ -114,10 +119,7 @@ nav a:hover {
   box-shadow: 0 4px 15px rgba(0,0,0,0.08);
 }
 
-.feature-box h3 {
-  color: #ff5f6d;
-  margin-bottom: 10px;
-}
+.feature-box h3 { color: #ff5f6d; margin-bottom: 10px; }
 
 /* CTA */
 .cta {
@@ -151,14 +153,20 @@ footer {
 
 /* RESPONSIVE */
 @media(max-width:600px){
-  .hero h2 {
-    font-size: 28px;
-  }
+  .hero h2 { font-size: 28px; }
 }
 </style>
 </head>
 
 <body>
+
+<!-- BACKGROUND DIVS -->
+<div id="bg1" style="background-image: url('https://share.google/zEIpWgqdMGMZuRgW3');"></div>
+<div id="bg2" style="background-image: url('https://share.google/cUpzwnjk5dXTEjnqw');"></div>
+<div id="bg3" style="background-image: url('https://share.google/z1ZM9tEPNWOJMWKRi'); position: fixed; top:0; left:0; width:100%; height:100%; background-size: cover; background-position: center; z-index:-2; opacity:0; transition: opacity 2s ease-in-out;"></div>
+
+<!-- OVERLAY -->
+<div id="overlay"></div>
 
 <header>
   <h1>Clark Dating</h1>
@@ -206,6 +214,21 @@ footer {
 function joinNow(){
   alert("Hapa utaunganisha ukurasa wa Sign Up 🔐");
 }
+
+// BACKGROUND FADE EFFECT
+let backgrounds = [
+  document.getElementById("bg1"),
+  document.getElementById("bg2"),
+  document.getElementById("bg3")
+];
+
+let current = 0;
+setInterval(()=>{
+  let next = (current + 1) % backgrounds.length;
+  backgrounds[current].style.opacity = 0;
+  backgrounds[next].style.opacity = 1;
+  current = next;
+}, 5000); // badilisha kila 5 sekunde
 </script>
 
 </body>
