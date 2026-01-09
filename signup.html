@@ -1,111 +1,82 @@
 <!DOCTYPE html>
-<html lang="sw">
+<html>
 <head>
-<meta charset="UTF-8">
+<title>Sign Up | Clark Dating</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sign Up | Clark</title>
 
 <style>
 body{
- background:linear-gradient(120deg,#ff5f6d,#ffc371);
- font-family:Arial;
- height:100vh;
- display:flex;
- justify-content:center;
- align-items:center;
+  height:100vh;
+  background:url("darny.jpeg") no-repeat center/cover;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-family:"Segoe UI";
 }
-
-.card{
- background:white;
- padding:30px;
- width:320px;
- border-radius:15px;
- text-align:center;
- box-shadow:0 10px 25px rgba(0,0,0,0.2);
+.glass{
+  background:rgba(255,255,255,.15);
+  backdrop-filter:blur(10px);
+  border-radius:20px;
+  padding:30px;
+  width:90%;
+  max-width:380px;
+  text-align:center;
+  color:white;
 }
-
 input{
- width:100%;
- padding:12px;
- margin:10px 0;
- border-radius:8px;
- border:1px solid #ccc;
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border-radius:25px;
+  border:none;
 }
-
 button{
- width:100%;
- padding:12px;
- background:#ff5f6d;
- color:white;
- border:none;
- border-radius:20px;
- font-size:16px;
- cursor:pointer;
+  width:100%;
+  padding:12px;
+  border-radius:25px;
+  border:none;
+  background:#ff4f8b;
+  color:white;
+  font-weight:bold;
 }
 </style>
 </head>
 
 <body>
-<div class="card">
-<h2>❤️ Create Account</h2>
-<!-- 🔑 Add IDs for JS -->
-<input id="name" placeholder="Full Name">
-<input id="email" placeholder="Email">
+
+<div class="glass">
+<h2>Create Account 💖</h2>
+
+<input id="email" type="email" placeholder="Email">
 <input id="password" type="password" placeholder="Password">
-<button id="signupBtn">Sign Up</button>
-<p><a href="login.html">Already have account?</a></p>
+
+<button onclick="signup()">Sign Up</button>
 </div>
 
-<!-- 🔥 FIREBASE COMPAT -->
+<!-- 🔥 FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-// Firebase Init – only once
-if (!firebase.apps.length) {
-  firebase.initializeApp({
-    apiKey: "AIzaSyDuAZOFqpyZoSH1FlbZ1G7O8YcNX63yDtM",
-    authDomain: "clark-online-dating.firebaseapp.com",
-    projectId: "clark-online-dating",
-    storageBucket: "clark-online-dating.firebasestorage.app",
-    messagingSenderId: "63074718758",
-    appId: "1:63074718758:web:6af5283a9cdbbc1cef82e7"
-  });
+const firebaseConfig = {
+  apiKey: "AIzaSyDuAZOFqpyZoSH1FlbZ1G7O8YcNX63yDtM",
+  authDomain: "clark-online-dating.firebaseapp.com",
+  projectId: "clark-online-dating",
+  storageBucket: "clark-online-dating.firebasestorage.app",
+  messagingSenderId: "63074718758",
+  appId: "1:63074718758:web:6af5283a9cdbbc1cef82e7"
+};
+firebase.initializeApp(firebaseConfig);
+
+function signup(){
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  firebase.auth().createUserWithEmailAndPassword(email,password)
+    .then(()=>window.location="login.html")
+    .catch(err=>alert(err.message));
 }
-
-const auth = firebase.auth();
-const db   = firebase.database();
-
-// Signup Function
-document.getElementById("signupBtn").addEventListener("click", function(){
-  const name = document.getElementById("name").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-
-  if(!name || !email || !password){
-    alert("Please fill all fields");
-    return;
-  }
-
-  auth.createUserWithEmailAndPassword(email, password)
-    .then(cred => {
-      // Save profile in DB
-      return db.ref("users/" + cred.user.uid).set({
-        name: name,
-        photo: "https://i.imgur.com/1X6sK5C.png",
-        createdAt: Date.now()
-      });
-    })
-    .then(() => {
-      alert("Account created successfully");
-      window.location.href = "chat.html"; // redirect to chat
-    })
-    .catch(err => {
-      alert("SIGN UP ERROR: " + err.message);
-      console.error(err);
-    });
-});
 </script>
+
 </body>
 </html>
