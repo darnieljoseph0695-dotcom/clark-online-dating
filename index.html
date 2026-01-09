@@ -1,230 +1,114 @@
 <!DOCTYPE html>
-<html lang="sw">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clark Online Dating</title>
 
 <style>
+/* ===== RESET ===== */
 * {
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
 }
 
+/* ===== BACKGROUND IMAGE ===== */
 body {
-  position:relative;
-  color:#fff;
-  overflow-x:hidden;
+  height: 100vh;
+  background: url("darny.jpeg") no-repeat center center/cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* BACKGROUND SLIDES */
-.bg-slide {
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background-size:cover;
-  background-position:center;
-  z-index:-2;
-  opacity:0;
-  transition:opacity 2s ease-in-out;
+/* ===== GLASS CONTAINER ===== */
+.glass {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 40px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
 }
 
-/* OVERLAY */
-#overlay {
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background-color: rgba(0,0,0,0.3);
-  z-index:-1;
+/* ===== TEXT ===== */
+.glass h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
 }
 
-/* HEADER */
-header {
-  position:relative;
-  z-index:1;
-  background: rgba(255,255,255,0.9);
-  padding: 15px 30px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  box-shadow:0 3px 10px rgba(0,0,0,0.1);
+.glass p {
+  font-size: 1rem;
+  margin-bottom: 30px;
+  opacity: 0.9;
 }
 
-header h1 { color: #ff5f6d; }
-
-nav a {
-  margin-left:15px;
-  text-decoration:none;
-  color:#333;
-  font-weight:bold;
+/* ===== BUTTONS ===== */
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-nav a:hover { color:#ff5f6d; }
-
-/* HERO */
-.hero {
-  position:relative;
-  z-index:1;
-  text-align:center;
-  padding:80px 20px;
+.buttons a {
+  text-decoration: none;
+  padding: 12px;
+  border-radius: 30px;
+  font-weight: bold;
+  transition: 0.3s;
 }
 
-.hero h2 { font-size:40px; margin-bottom:15px; }
-
-.hero p { font-size:18px; margin-bottom:30px; }
-
-.hero button {
-  background:white;
-  color:#ff5f6d;
-  border:none;
-  padding:15px 35px;
-  font-size:18px;
-  border-radius:30px;
-  cursor:pointer;
-  font-weight:bold;
+/* Login Button */
+.login {
+  background: rgba(255, 255, 255, 0.85);
+  color: #e91e63;
 }
 
-.hero button:hover { background:#ffe1e4; }
-
-/* FEATURES */
-.features {
-  position:relative;
-  z-index:1;
-  background: rgba(255,255,255,0.9);
-  padding:60px 20px;
-  display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(250px,1fr));
-  gap:20px;
+.login:hover {
+  background: white;
 }
 
-.feature-box {
-  background:#fafafa;
-  padding:30px;
-  text-align:center;
-  border-radius:15px;
-  box-shadow:0 4px 15px rgba(0,0,0,0.08);
+/* Signup Button */
+.signup {
+  border: 2px solid white;
+  color: white;
 }
 
-.feature-box h3 { color:#ff5f6d; margin-bottom:10px; }
-
-/* CTA */
-.cta {
-  position:relative;
-  z-index:1;
-  text-align:center;
-  padding:70px 20px;
-  background:#ff5f6d;
-  color:white;
+.signup:hover {
+  background: white;
+  color: #e91e63;
 }
 
-.cta button {
-  margin-top:20px;
-  padding:14px 30px;
-  border:none;
-  border-radius:25px;
-  font-size:17px;
-  cursor:pointer;
-  font-weight:bold;
-}
-
-/* FOOTER */
-footer {
-  position:relative;
-  z-index:1;
-  background:#222;
-  color:#aaa;
-  text-align:center;
-  padding:20px;
-}
-
-/* RESPONSIVE */
-@media(max-width:600px){
-  .hero h2 { font-size:28px; }
+/* ===== FOOTER ===== */
+.footer {
+  margin-top: 25px;
+  font-size: 0.8rem;
+  opacity: 0.8;
 }
 </style>
 </head>
 
 <body>
 
-<!-- BACKGROUND SLIDES -->
-<div id="bg1" class="bg-slide" style="background-image:url('https://raw.githubusercontent.com/darnieljoseph0695-dotcom/clark-online-dating/main/images/girl1.jpg'); opacity:1;"></div>
-<div id="bg2" class="bg-slide" style="background-image:url('https://raw.githubusercontent.com/darnieljoseph0695-dotcom/clark-online-dating/main/images/girl2.jpg');"></div>
-<div id="bg3" class="bg-slide" style="background-image:url('https://raw.githubusercontent.com/darnieljoseph0695-dotcom/clark-online-dating/main/images/love_wall1.jpg');"></div>
+<div class="glass">
+  <h1>❤️ Clark Dating</h1>
+  <p>Find love, chat & connect with real people</p>
 
-<div id="overlay"></div>
-
-<header>
-  <h1>Clark Dating</h1>
-  <nav>
-   <a href="login.html">Login</a>
-   <a href="signup.html">Sign Up</a>
-   <a href="chat.html">Chat</a>
-  </nav>
-</header>
-
-<section class="hero">
-  <h2>Pata Mpenzi Wako Mtandaoni ❤️</h2>
-  <p>Jiunge na Clark Online Dating – mahali pa kukutana, kuzungumza na kupendana.</p>
-  <button onclick="joinNow()">Anza Sasa</button>
-</section>
-
-<section class="features">
-  <div class="feature-box">
-    <h3>Profile Halisi</h3>
-    <p>Unda profile yako na ujitambulishe kwa urahisi.</p>
+  <div class="buttons">
+    <a href="login.html" class="login">Login</a>
+    <a href="signup.html" class="signup">Sign Up</a>
   </div>
 
-  <div class="feature-box">
-    <h3>Chat Haraka</h3>
-    <p>Zungumza papo hapo na watu unaowapenda.</p>
+  <div class="footer">
+    © 2026 Clark Online Dating
   </div>
-
-  <div class="feature-box">
-    <h3>Salama</h3>
-    <p>Usalama na faragha ya watumiaji ni kipaumbele.</p>
-  </div>
-</section>
-
-<section class="cta">
-  <h2>Usikose Nafasi ❤️</h2>
-  <p>Maelfu ya watu tayari wako ndani</p>
-  <button onclick="joinNow()">Create Account</button>
-</section>
-
-<footer>
-  <p>© 2026 Clark Online Dating | All Rights Reserved</p>
-</footer>
-
-<script>
-function joinNow(){
-  alert("Hapa utaunganisha ukurasa wa Sign Up 🔐");
-}
-
-// SLIDESHOW
-let bgSlides = [
-  document.getElementById("bg1"),
-  document.getElementById("bg2"),
-  document.getElementById("bg3")
-];
-
-let currentIndex = 0;
-
-setInterval(()=>{
-  let nextIndex;
-  do { nextIndex = Math.floor(Math.random()*bgSlides.length); } 
-  while(nextIndex===currentIndex);
-
-  bgSlides[currentIndex].style.opacity=0;
-  bgSlides[nextIndex].style.opacity=1;
-  currentIndex=nextIndex;
-},5000);
-</script>
+</div>
 
 </body>
 </html>
