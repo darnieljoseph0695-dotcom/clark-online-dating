@@ -1,59 +1,102 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Clark Dating Chat</title>
 <style>
-body{
-  margin:0; padding:0; font-family:"Segoe UI";
-  height:100vh;
-  background:url("darny.jpeg") no-repeat center/cover;
-  display:flex; justify-content:center; align-items:center;
+body {
+  margin: 0; padding: 0; font-family: "Segoe UI";
+  height: 100vh;
+  background: url("darny.jpeg") no-repeat center/cover;
+  display: flex; justify-content: center; align-items: center;
 }
-.chat-container{
-  width:95%; max-width:900px; height:85vh;
-  display:flex; background:rgba(255,255,255,.15);
-  backdrop-filter:blur(12px); border-radius:20px; overflow:hidden;
+.chat-container {
+  width: 95%; max-width: 900px; height: 85vh;
+  display: flex;
+  background: rgba(255,255,255,.15);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  overflow: hidden;
 }
-.sidebar{
-  width:30%; border-right:1px solid rgba(255,255,255,.3);
-  overflow-y:auto; background:rgba(255,255,255,.1);
+.sidebar {
+  width: 30%;
+  border-right: 1px solid rgba(255,255,255,.3);
+  overflow-y: auto;
+  background: rgba(255,255,255,.1);
 }
-.sidebar h3{ padding:10px; text-align:center; color:white; }
-.user-item{
-  display:flex; align-items:center; padding:10px;
-  cursor:pointer; border-bottom:1px solid rgba(255,255,255,.2);
+.sidebar h3 {
+  padding: 10px;
+  text-align: center;
+  color: white;
 }
-.user-item img{
-  width:40px; height:40px; border-radius:50%; margin-right:10px;
+.user-item {
+  display: flex; align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,.2);
 }
-.user-item span{ color:white; }
-.user-item.active{ background:rgba(255,255,255,.2); }
-
-.chat-area{
-  flex:1; display:flex; flex-direction:column; justify-content:space-between;
+.user-item img {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
 }
-.chat-header{
-  padding:10px; border-bottom:1px solid rgba(255,255,255,.3);
-  color:white; font-weight:bold;
+.user-item span {
+  color: white;
 }
-.messages{
-  flex:1; padding:10px; overflow-y:auto;
+.user-item.active {
+  background: rgba(255,255,255,.2);
 }
-.msg{ padding:10px 15px; margin-bottom:10px; border-radius:20px; max-width:70%; }
-.msg.me{ background:#ff4f8b; margin-left:auto; color:white; }
-.msg.other{ background:rgba(255,255,255,.35); margin-right:auto; color:white; }
-
-.input-box{
-  display:flex; padding:10px; border-top:1px solid rgba(255,255,255,.3);
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
-.input-box input{
-  flex:1; padding:10px; border-radius:20px; border:none;
+.chat-header {
+  padding: 10px;
+  border-bottom: 1px solid rgba(255,255,255,.3);
+  color: white;
+  font-weight: bold;
 }
-.input-box button{
-  padding:10px 15px; border-radius:20px; border:none;
-  background:#ff4f8b; color:white;
+.messages {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+}
+.msg {
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  border-radius: 20px;
+  max-width: 70%;
+}
+.msg.me {
+  background: #ff4f8b;
+  margin-left: auto;
+  color: white;
+}
+.msg.other {
+  background: rgba(255,255,255,.35);
+  margin-right: auto;
+  color: white;
+}
+.input-box {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid rgba(255,255,255,.3);
+}
+.input-box input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 20px;
+  border: none;
+}
+.input-box button {
+  padding: 10px 15px;
+  border-radius: 20px;
+  border: none;
+  background: #ff4f8b;
+  color: white;
 }
 </style>
 </head>
@@ -69,20 +112,18 @@ body{
     <div class="chat-header" id="chat-header">Select a user</div>
     <div class="messages" id="messages"></div>
     <div class="input-box">
-      <input id="text" placeholder="Type a message...">
+      <input id="text" placeholder="Type a message..." />
       <button onclick="sendMessage()">Send</button>
     </div>
   </div>
 </div>
 
-<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script>
-// 🔥 CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyDuAZOFqpyZoSH1FlbZ1G7O8YcNX63yDtM",
   authDomain: "clark-online-dating.firebaseapp.com",
@@ -96,83 +137,97 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
-const storage = firebase.storage();
 
 let currentUser = null;
 let selectedUser = null;
 
-// Protect page
-auth.onAuthStateChanged(user=>{
-  if(!user) window.location="login.html";
-  else{
+auth.onAuthStateChanged(user => {
+  if (!user) {
+    window.location = "login.html";
+  } else {
     currentUser = user;
     loadUsers();
   }
 });
 
-// Load all users
-function loadUsers(){
-  db.ref("users").once("value").then(snapshot=>{
-    const usersList = document.getElementById("users-list");
-    usersList.innerHTML = "";
-    snapshot.forEach(child=>{
-      const user = child.val();
-      if(user.uid === currentUser.uid) return; // skip self
-      const div = document.createElement("div");
-      div.className="user-item";
-      div.onclick = ()=>selectUser(user);
-      div.innerHTML = `<img src="${user.photoURL}" /> <span>${user.email}</span>`;
-      div.id = user.uid;
-      usersList.appendChild(div);
+function loadUsers() {
+  const usersList = document.getElementById("users-list");
+  usersList.innerHTML = "Loading users...";
+  db.ref("users").once("value")
+    .then(snapshot => {
+      if (!snapshot.exists()) {
+        usersList.innerHTML = "No users found";
+        return;
+      }
+      usersList.innerHTML = "";
+      snapshot.forEach(child => {
+        const user = child.val();
+        if (user.uid === currentUser.uid) return; // skip self
+
+        const div = document.createElement("div");
+        div.className = "user-item";
+        div.id = user.uid;
+        div.onclick = () => selectUser(user);
+        div.innerHTML = `<img src="${user.photoURL}" alt="profile" /> <span>${user.email}</span>`;
+        usersList.appendChild(div);
+      });
+    })
+    .catch(err => {
+      usersList.innerHTML = "Error loading users";
+      console.error(err);
     });
-  });
 }
 
-// Select a user to chat with
-function selectUser(user){
+function selectUser(user) {
   selectedUser = user;
   document.getElementById("chat-header").innerText = user.email;
   document.getElementById("messages").innerHTML = "";
-  document.querySelectorAll(".user-item").forEach(u=>u.classList.remove("active"));
+  document.querySelectorAll(".user-item").forEach(el => el.classList.remove("active"));
   document.getElementById(user.uid).classList.add("active");
 
-  // Listen messages between currentUser & selectedUser
   const chatId = generateChatId(currentUser.uid, selectedUser.uid);
-  db.ref("chats/"+chatId).off(); // remove old listener
-  db.ref("chats/"+chatId).on("child_added", snapshot=>{
-    const msg = snapshot.val();
-    displayMessage(msg);
+
+  // Remove old listener if any
+  db.ref("chats/" + chatId).off();
+
+  // Listen for new messages
+  db.ref("chats/" + chatId).on("child_added", snapshot => {
+    displayMessage(snapshot.val());
   });
 }
 
-// Generate consistent chat ID
-function generateChatId(uid1, uid2){
-  return uid1 < uid2 ? uid1+"_"+uid2 : uid2+"_"+uid1;
+function generateChatId(uid1, uid2) {
+  return uid1 < uid2 ? uid1 + "_" + uid2 : uid2 + "_" + uid1;
 }
 
-// Display message
-function displayMessage(msg){
+function displayMessage(msg) {
+  const messagesDiv = document.getElementById("messages");
   const div = document.createElement("div");
-  div.className="msg "+(msg.sender===currentUser.uid?"me":"other");
-  div.innerText=msg.text;
-  document.getElementById("messages").appendChild(div);
-  document.getElementById("messages").scrollTop=document.getElementById("messages").scrollHeight;
+  div.className = "msg " + (msg.sender === currentUser.uid ? "me" : "other");
+  div.innerText = msg.text;
+  messagesDiv.appendChild(div);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-// Send message
-function sendMessage(){
-  if(!selectedUser) return alert("Select a user first!");
-  const text = document.getElementById("text").value;
-  if(text==="") return;
+function sendMessage() {
+  if (!selectedUser) {
+    alert("Select a user first!");
+    return;
+  }
+  const textInput = document.getElementById("text");
+  const text = textInput.value.trim();
+  if (text === "") return;
+
   const chatId = generateChatId(currentUser.uid, selectedUser.uid);
-  db.ref("chats/"+chatId).push({
+
+  db.ref("chats/" + chatId).push({
     sender: currentUser.uid,
     text: text,
     time: Date.now()
   });
-  document.getElementById("text").value="";
+  textInput.value = "";
 }
-
 </script>
+
 </body>
 </html>
