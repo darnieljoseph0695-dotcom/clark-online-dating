@@ -18,7 +18,7 @@ body {
   width: 90%;
   max-width: 400px;
   padding: 30px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255,255,255,0.15);
   backdrop-filter: blur(10px);
   border-radius: 20px;
   text-align: center;
@@ -46,14 +46,12 @@ button {
 
 <div class="glass">
   <h2>Create Account 💖</h2>
-  <input id="email" type="email" placeholder="Email" />
-  <input id="password" type="password" placeholder="Password" />
-  <input id="photo" type="file" accept="image/*" />
+  <input id="username" type="text" placeholder="Username">
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <input id="photo" type="file" accept="image/*">
   <button onclick="signup()">Sign Up</button>
-  <p>
-    Already have account?
-    <a href="login.html" style="color: white">Login</a>
-  </p>
+  <p>Already have account? <a href="login.html" style="color:white;">Login</a></p>
 </div>
 
 <!-- FIREBASE -->
@@ -77,36 +75,35 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-async function signup() {
+function signup() {
+  const username = document.getElementById("username").value.trim();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   const file = document.getElementById("photo").files[0];
 
-  if (!email || !password || !file) return alert("All fields are required!");
+  if (!username || !email || !password || !file) return alert("All fields are required!");
 
-  try {
-    const cred = await auth.createUserWithEmailAndPassword(email, password);
-    const uid = cred.user.uid;
-
-    // Upload profile picture
-    const ref = storage.ref("profiles/" + uid);
-    await ref.put(file);
-    const url = await ref.getDownloadURL();
-
-    // Save user info in Firestore
-    await db.collection("users").doc(uid).set({
-      uid: uid,
-      email: email,
-      photoURL: url,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    alert("Account created successfully!");
-    window.location = "login.html";
-  } catch (err) {
-    alert(err.message);
-  }
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(cred => {
+      const uid = cred.user.uid;
+      const ref = storage.ref("profiles/" + uid);
+      ref.put(file).then(() => {
+        ref.getDownloadURL().then(url => {
+          db.collection("users").doc(uid).set({
+            uid: uid,
+            username: username,
+            email: email,
+            photoURL: url
+          }).then(() => {
+            alert("Account created successfully!");
+            window.location = "login.html";
+          });
+        });
+      });
+    })
+    .catch(err => alert(err.message));
 }
 </script>
+
 </body>
 </html>
