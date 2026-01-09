@@ -20,16 +20,16 @@ body {
   max-width: 900px;
   height: 85vh;
   display: flex;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255,255,255,0.15);
   backdrop-filter: blur(12px);
   border-radius: 20px;
   overflow: hidden;
 }
 .sidebar {
   width: 30%;
-  border-right: 1px solid rgba(255, 255, 255, 0.3);
+  border-right: 1px solid rgba(255,255,255,0.3);
   overflow-y: auto;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255,255,255,0.1);
 }
 .sidebar h3 {
   padding: 10px;
@@ -41,7 +41,7 @@ body {
   align-items: center;
   padding: 10px;
   cursor: pointer;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(255,255,255,0.2);
 }
 .user-item img {
   width: 40px;
@@ -53,7 +53,7 @@ body {
   color: white;
 }
 .user-item.active {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255,255,255,0.2);
 }
 .chat-area {
   flex: 1;
@@ -63,7 +63,7 @@ body {
 }
 .chat-header {
   padding: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(255,255,255,0.3);
   color: white;
   font-weight: bold;
 }
@@ -84,14 +84,14 @@ body {
   color: white;
 }
 .msg.other {
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255,255,255,0.35);
   margin-right: auto;
   color: white;
 }
 .input-box {
   display: flex;
   padding: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  border-top: 1px solid rgba(255,255,255,0.3);
 }
 .input-box input {
   flex: 1;
@@ -168,27 +168,24 @@ async function loadUsers() {
     const div = document.createElement("div");
     div.className = "user-item";
     div.onclick = () => selectUser(user);
-    div.innerHTML = `<img src="${user.photoURL || "default-profile.png"}" /> <span>${user.username || user.email}</span>`;
+    div.innerHTML = `<img src="${user.photoURL || 'default-profile.png'}" /> <span>${user.username || user.email}</span>`;
     div.id = user.uid;
     usersList.appendChild(div);
   });
 }
 
+let unsubscribe = null;
+
 function selectUser(user) {
   selectedUser = user;
-  document.getElementById("chat-header").innerText = user.email || user.username;
+  document.getElementById("chat-header").innerText = user.username || user.email;
   document.getElementById("messages").innerHTML = "";
   document.querySelectorAll(".user-item").forEach(u => u.classList.remove("active"));
   document.getElementById(user.uid).classList.add("active");
 
-  listenMessages(currentUser.uid, selectedUser.uid);
-}
-
-let unsubscribe = null;
-function listenMessages(uid1, uid2) {
   if (unsubscribe) unsubscribe();
-  const chatId = generateChatId(uid1, uid2);
 
+  const chatId = generateChatId(currentUser.uid, selectedUser.uid);
   unsubscribe = db.collection("chats")
     .doc(chatId)
     .collection("messages")
@@ -196,10 +193,7 @@ function listenMessages(uid1, uid2) {
     .onSnapshot(snapshot => {
       const messagesDiv = document.getElementById("messages");
       messagesDiv.innerHTML = "";
-      snapshot.forEach(doc => {
-        const msg = doc.data();
-        displayMessage(msg);
-      });
+      snapshot.forEach(doc => displayMessage(doc.data()));
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
     });
 }
@@ -212,16 +206,18 @@ function displayMessage(msg) {
   const div = document.createElement("div");
   div.className = "msg " + (msg.sender === currentUser.uid ? "me" : "other");
   div.innerText = msg.text;
-  document.getElementById("messages").appendChild(div);
+  const messagesDiv = document.getElementById("messages");
+  messagesDiv.appendChild(div);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
 function sendMessage() {
   if (!selectedUser) return alert("Select a user first!");
-  const text = document.getElementById("text").value;
+  const textInput = document.getElementById("text");
+  const text = textInput.value.trim();
   if (text === "") return;
 
   const chatId = generateChatId(currentUser.uid, selectedUser.uid);
-
   db.collection("chats")
     .doc(chatId)
     .collection("messages")
@@ -230,8 +226,7 @@ function sendMessage() {
       text: text,
       time: firebase.firestore.FieldValue.serverTimestamp()
     });
-
-  document.getElementById("text").value = "";
+  textInput.value = "";
 }
 </script>
 </body>
