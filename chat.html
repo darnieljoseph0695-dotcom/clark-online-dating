@@ -6,24 +6,30 @@
 <title>Clark Dating Chat</title>
 <style>
 body {
-  margin: 0; padding: 0; font-family: "Segoe UI";
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI";
   height: 100vh;
   background: url("darny.jpeg") no-repeat center/cover;
-  display: flex; justify-content: center; align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .chat-container {
-  width: 95%; max-width: 900px; height: 85vh;
+  width: 95%;
+  max-width: 900px;
+  height: 85vh;
   display: flex;
-  background: rgba(255,255,255,.15);
+  background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(12px);
   border-radius: 20px;
   overflow: hidden;
 }
 .sidebar {
   width: 30%;
-  border-right: 1px solid rgba(255,255,255,.3);
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
   overflow-y: auto;
-  background: rgba(255,255,255,.1);
+  background: rgba(255, 255, 255, 0.1);
 }
 .sidebar h3 {
   padding: 10px;
@@ -31,13 +37,15 @@ body {
   color: white;
 }
 .user-item {
-  display: flex; align-items: center;
+  display: flex;
+  align-items: center;
   padding: 10px;
   cursor: pointer;
-  border-bottom: 1px solid rgba(255,255,255,.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 .user-item img {
-  width: 40px; height: 40px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   margin-right: 10px;
 }
@@ -45,7 +53,7 @@ body {
   color: white;
 }
 .user-item.active {
-  background: rgba(255,255,255,.2);
+  background: rgba(255, 255, 255, 0.2);
 }
 .chat-area {
   flex: 1;
@@ -55,7 +63,7 @@ body {
 }
 .chat-header {
   padding: 10px;
-  border-bottom: 1px solid rgba(255,255,255,.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
   font-weight: bold;
 }
@@ -76,14 +84,14 @@ body {
   color: white;
 }
 .msg.other {
-  background: rgba(255,255,255,.35);
+  background: rgba(255, 255, 255, 0.35);
   margin-right: auto;
   color: white;
 }
 .input-box {
   display: flex;
   padding: 10px;
-  border-top: 1px solid rgba(255,255,255,.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
 }
 .input-box input {
   flex: 1;
@@ -118,82 +126,82 @@ body {
   </div>
 </div>
 
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyDuAZOFqpyZoSH1FlbZ1G7O8YcNX63yDtM",
   authDomain: "clark-online-dating.firebaseapp.com",
-  databaseURL: "https://clark-online-dating-default-rtdb.firebaseio.com",
   projectId: "clark-online-dating",
-  storageBucket: "clark-online-dating.firebasestorage.app",
+  storageBucket: "clark-online-dating.appspot.com",
   messagingSenderId: "63074718758",
   appId: "1:63074718758:web:6af5283a9cdbbc1cef82e7"
 };
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-const db = firebase.database();
+const db = firebase.firestore();
+const storage = firebase.storage();
 
 let currentUser = null;
 let selectedUser = null;
 
 auth.onAuthStateChanged(user => {
-  if (!user) {
-    window.location = "login.html";
-  } else {
+  if (!user) window.location = "login.html";
+  else {
     currentUser = user;
     loadUsers();
   }
 });
 
-function loadUsers() {
+async function loadUsers() {
   const usersList = document.getElementById("users-list");
-  usersList.innerHTML = "Loading users...";
-  db.ref("users").once("value")
-    .then(snapshot => {
-      if (!snapshot.exists()) {
-        usersList.innerHTML = "No users found";
-        return;
-      }
-      usersList.innerHTML = "";
-      snapshot.forEach(child => {
-        const user = child.val();
-        if (user.uid === currentUser.uid) return; // skip self
-
-        const div = document.createElement("div");
-        div.className = "user-item";
-        div.id = user.uid;
-        div.onclick = () => selectUser(user);
-        div.innerHTML = `<img src="${user.photoURL}" alt="profile" /> <span>${user.email}</span>`;
-        usersList.appendChild(div);
-      });
-    })
-    .catch(err => {
-      usersList.innerHTML = "Error loading users";
-      console.error(err);
-    });
+  usersList.innerHTML = "";
+  const snapshot = await db.collection("users").get();
+  snapshot.forEach(doc => {
+    const user = doc.data();
+    if (user.uid === currentUser.uid) return; // skip self
+    const div = document.createElement("div");
+    div.className = "user-item";
+    div.onclick = () => selectUser(user);
+    div.innerHTML = `<img src="${user.photoURL || "default-profile.png"}" /> <span>${user.email || user.username}</span>`;
+    div.id = user.uid;
+    usersList.appendChild(div);
+  });
 }
 
 function selectUser(user) {
   selectedUser = user;
-  document.getElementById("chat-header").innerText = user.email;
+  document.getElementById("chat-header").innerText = user.email || user.username;
   document.getElementById("messages").innerHTML = "";
-  document.querySelectorAll(".user-item").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll(".user-item").forEach(u => u.classList.remove("active"));
   document.getElementById(user.uid).classList.add("active");
 
-  const chatId = generateChatId(currentUser.uid, selectedUser.uid);
+  listenMessages(currentUser.uid, selectedUser.uid);
+}
 
-  // Remove old listener if any
-  db.ref("chats/" + chatId).off();
+let unsubscribe = null;
+function listenMessages(uid1, uid2) {
+  if (unsubscribe) unsubscribe();
+  const chatId = generateChatId(uid1, uid2);
 
-  // Listen for new messages
-  db.ref("chats/" + chatId).on("child_added", snapshot => {
-    displayMessage(snapshot.val());
-  });
+  unsubscribe = db.collection("chats")
+    .doc(chatId)
+    .collection("messages")
+    .orderBy("time")
+    .onSnapshot(snapshot => {
+      const messagesDiv = document.getElementById("messages");
+      messagesDiv.innerHTML = "";
+      snapshot.forEach(doc => {
+        const msg = doc.data();
+        displayMessage(msg);
+      });
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    });
 }
 
 function generateChatId(uid1, uid2) {
@@ -201,33 +209,30 @@ function generateChatId(uid1, uid2) {
 }
 
 function displayMessage(msg) {
-  const messagesDiv = document.getElementById("messages");
   const div = document.createElement("div");
   div.className = "msg " + (msg.sender === currentUser.uid ? "me" : "other");
   div.innerText = msg.text;
-  messagesDiv.appendChild(div);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  document.getElementById("messages").appendChild(div);
 }
 
 function sendMessage() {
-  if (!selectedUser) {
-    alert("Select a user first!");
-    return;
-  }
-  const textInput = document.getElementById("text");
-  const text = textInput.value.trim();
+  if (!selectedUser) return alert("Select a user first!");
+  const text = document.getElementById("text").value;
   if (text === "") return;
 
   const chatId = generateChatId(currentUser.uid, selectedUser.uid);
 
-  db.ref("chats/" + chatId).push({
-    sender: currentUser.uid,
-    text: text,
-    time: Date.now()
-  });
-  textInput.value = "";
+  db.collection("chats")
+    .doc(chatId)
+    .collection("messages")
+    .add({
+      sender: currentUser.uid,
+      text: text,
+      time: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+  document.getElementById("text").value = "";
 }
 </script>
-
 </body>
 </html>
