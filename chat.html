@@ -1,110 +1,59 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clark Dating Chat</title>
 <style>
-body {
-  margin: 0;
-  padding: 0;
-  font-family: "Segoe UI";
-  height: 100vh;
-  background: url("darny.jpeg") no-repeat center/cover;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+body{
+  margin:0; padding:0; font-family:"Segoe UI";
+  height:100vh;
+  background:url("darny.jpeg") no-repeat center/cover;
+  display:flex; justify-content:center; align-items:center;
 }
-.chat-container {
-  width: 95%;
-  max-width: 900px;
-  height: 85vh;
-  display: flex;
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(12px);
-  border-radius: 20px;
-  overflow: hidden;
+.chat-container{
+  width:95%; max-width:900px; height:85vh;
+  display:flex; background:rgba(255,255,255,.15);
+  backdrop-filter:blur(12px); border-radius:20px; overflow:hidden;
 }
-.sidebar {
-  width: 30%;
-  border-right: 1px solid rgba(255,255,255,0.3);
-  overflow-y: auto;
-  background: rgba(255,255,255,0.1);
+.sidebar{
+  width:30%; border-right:1px solid rgba(255,255,255,.3);
+  overflow-y:auto; background:rgba(255,255,255,.1);
 }
-.sidebar h3 {
-  padding: 10px;
-  text-align: center;
-  color: white;
+.sidebar h3{ padding:10px; text-align:center; color:white; }
+.user-item{
+  display:flex; align-items:center; padding:10px;
+  cursor:pointer; border-bottom:1px solid rgba(255,255,255,.2);
 }
-.user-item {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  cursor: pointer;
-  border-bottom: 1px solid rgba(255,255,255,0.2);
+.user-item img{
+  width:40px; height:40px; border-radius:50%; margin-right:10px;
 }
-.user-item img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
+.user-item span{ color:white; }
+.user-item.active{ background:rgba(255,255,255,.2); }
+
+.chat-area{
+  flex:1; display:flex; flex-direction:column; justify-content:space-between;
 }
-.user-item span {
-  color: white;
+.chat-header{
+  padding:10px; border-bottom:1px solid rgba(255,255,255,.3);
+  color:white; font-weight:bold;
 }
-.user-item.active {
-  background: rgba(255,255,255,0.2);
+.messages{
+  flex:1; padding:10px; overflow-y:auto;
 }
-.chat-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+.msg{ padding:10px 15px; margin-bottom:10px; border-radius:20px; max-width:70%; word-wrap: break-word; }
+.msg.me{ background:#ff4f8b; margin-left:auto; color:white; }
+.msg.other{ background:rgba(255,255,255,.35); margin-right:auto; color:white; }
+
+.input-box{
+  display:flex; padding:10px; border-top:1px solid rgba(255,255,255,.3);
 }
-.chat-header {
-  padding: 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.3);
-  color: white;
-  font-weight: bold;
+.input-box input{
+  flex:1; padding:10px; border-radius:20px; border:none;
 }
-.messages {
-  flex: 1;
-  padding: 10px;
-  overflow-y: auto;
-}
-.msg {
-  padding: 10px 15px;
-  margin-bottom: 10px;
-  border-radius: 20px;
-  max-width: 70%;
-}
-.msg.me {
-  background: #ff4f8b;
-  margin-left: auto;
-  color: white;
-}
-.msg.other {
-  background: rgba(255,255,255,0.35);
-  margin-right: auto;
-  color: white;
-}
-.input-box {
-  display: flex;
-  padding: 10px;
-  border-top: 1px solid rgba(255,255,255,0.3);
-}
-.input-box input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 20px;
-  border: none;
-}
-.input-box button {
-  padding: 10px 15px;
-  border-radius: 20px;
-  border: none;
-  background: #ff4f8b;
-  color: white;
+.input-box button{
+  padding:10px 15px; border-radius:20px; border:none;
+  background:#ff4f8b; color:white;
 }
 </style>
 </head>
@@ -120,7 +69,7 @@ body {
     <div class="chat-header" id="chat-header">Select a user</div>
     <div class="messages" id="messages"></div>
     <div class="input-box">
-      <input id="text" placeholder="Type a message..." />
+      <input id="text" placeholder="Type a message...">
       <button onclick="sendMessage()">Send</button>
     </div>
   </div>
@@ -130,14 +79,14 @@ body {
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script>
+// 🔥 CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyDuAZOFqpyZoSH1FlbZ1G7O8YcNX63yDtM",
   authDomain: "clark-online-dating.firebaseapp.com",
   projectId: "clark-online-dating",
-  storageBucket: "clark-online-dating.appspot.com",
+  storageBucket: "clark-online-dating.firebasestorage.app",
   messagingSenderId: "63074718758",
   appId: "1:63074718758:web:6af5283a9cdbbc1cef82e7"
 };
@@ -145,88 +94,95 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-const storage = firebase.storage();
 
 let currentUser = null;
 let selectedUser = null;
+let unsubscribeMessages = null;
 
-auth.onAuthStateChanged(user => {
-  if (!user) window.location = "login.html";
-  else {
+// Protect page
+auth.onAuthStateChanged(user=>{
+  if(!user) window.location="login.html";
+  else{
     currentUser = user;
     loadUsers();
   }
 });
 
-async function loadUsers() {
-  const usersList = document.getElementById("users-list");
-  usersList.innerHTML = "";
-  const snapshot = await db.collection("users").get();
-  snapshot.forEach(doc => {
-    const user = doc.data();
-    if (user.uid === currentUser.uid) return; // skip self
-    const div = document.createElement("div");
-    div.className = "user-item";
-    div.onclick = () => selectUser(user);
-    div.innerHTML = `<img src="${user.photoURL || 'default-profile.png'}" /> <span>${user.username || user.email}</span>`;
-    div.id = user.uid;
-    usersList.appendChild(div);
+// Load users for sidebar
+function loadUsers(){
+  db.collection("users").get().then(snapshot=>{
+    const usersList = document.getElementById("users-list");
+    usersList.innerHTML = "";
+    snapshot.forEach(doc=>{
+      const user = doc.data();
+      if(user.uid === currentUser.uid) return; // skip self
+      const div = document.createElement("div");
+      div.className="user-item";
+      div.id=user.uid;
+      div.onclick=()=>selectUser(user);
+      div.innerHTML=`<img src="${user.photoURL}" /> <span>${user.username}</span>`;
+      usersList.appendChild(div);
+    });
   });
 }
 
-let unsubscribe = null;
+// Generate consistent chat ID
+function generateChatId(uid1, uid2){
+  return uid1 < uid2 ? uid1+"_"+uid2 : uid2+"_"+uid1;
+}
 
-function selectUser(user) {
-  selectedUser = user;
-  document.getElementById("chat-header").innerText = user.username || user.email;
-  document.getElementById("messages").innerHTML = "";
-  document.querySelectorAll(".user-item").forEach(u => u.classList.remove("active"));
+// Select user
+function selectUser(user){
+  selectedUser=user;
+  document.getElementById("chat-header").innerText=user.username;
+  document.getElementById("messages").innerHTML="";
+  document.querySelectorAll(".user-item").forEach(u=>u.classList.remove("active"));
   document.getElementById(user.uid).classList.add("active");
 
-  if (unsubscribe) unsubscribe();
+  if(unsubscribeMessages) unsubscribeMessages(); // remove old listener
 
   const chatId = generateChatId(currentUser.uid, selectedUser.uid);
-  unsubscribe = db.collection("chats")
-    .doc(chatId)
+
+  // Listen messages in realtime
+  unsubscribeMessages = db.collection("chats").doc(chatId)
     .collection("messages")
     .orderBy("time")
-    .onSnapshot(snapshot => {
+    .onSnapshot(snapshot=>{
       const messagesDiv = document.getElementById("messages");
-      messagesDiv.innerHTML = "";
-      snapshot.forEach(doc => displayMessage(doc.data()));
+      messagesDiv.innerHTML="";
+      snapshot.forEach(doc=>displayMessage(doc.data()));
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
     });
 }
 
-function generateChatId(uid1, uid2) {
-  return uid1 < uid2 ? uid1 + "_" + uid2 : uid2 + "_" + uid1;
-}
-
-function displayMessage(msg) {
+// Display message
+function displayMessage(msg){
   const div = document.createElement("div");
-  div.className = "msg " + (msg.sender === currentUser.uid ? "me" : "other");
+  div.className = msg.sender===currentUser.uid?"msg me":"msg other";
   div.innerText = msg.text;
-  const messagesDiv = document.getElementById("messages");
-  messagesDiv.appendChild(div);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  document.getElementById("messages").appendChild(div);
 }
 
-function sendMessage() {
-  if (!selectedUser) return alert("Select a user first!");
-  const textInput = document.getElementById("text");
-  const text = textInput.value.trim();
-  if (text === "") return;
+// Send message
+function sendMessage(){
+  if(!selectedUser) return alert("Select a user first!");
+  const text = document.getElementById("text").value.trim();
+  if(!text) return;
 
   const chatId = generateChatId(currentUser.uid, selectedUser.uid);
-  db.collection("chats")
-    .doc(chatId)
-    .collection("messages")
-    .add({
-      sender: currentUser.uid,
-      text: text,
-      time: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  textInput.value = "";
+  const chatRef = db.collection("chats").doc(chatId);
+
+  // Ensure chat doc exists
+  chatRef.set({ users: [currentUser.uid, selectedUser.uid] }, { merge:true });
+
+  // Add message
+  chatRef.collection("messages").add({
+    sender: currentUser.uid,
+    text: text,
+    time: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  document.getElementById("text").value="";
 }
 </script>
 </body>
