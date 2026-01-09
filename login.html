@@ -1,28 +1,64 @@
 <!DOCTYPE html>
-<html lang="sw">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login | Clark</title>
+<title>Login | Clark Dating</title>
+
 <style>
-body{background:linear-gradient(120deg,#ff5f6d,#ffc371);font-family:Arial;display:flex;justify-content:center;align-items:center;height:100vh;}
-.card{background:white;padding:30px;width:300px;border-radius:15px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,0.2);}
-input{width:100%;padding:12px;margin:10px 0;border-radius:8px;border:1px solid #ccc;}
-button{width:100%;padding:12px;background:#ff5f6d;color:white;border:none;border-radius:20px;font-size:16px;cursor:pointer;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",sans-serif}
+body{
+  height:100vh;
+  background:url("darny.jpeg") no-repeat center/cover;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.glass{
+  background:rgba(255,255,255,.15);
+  backdrop-filter:blur(10px);
+  border-radius:20px;
+  padding:35px;
+  width:90%;
+  max-width:360px;
+  text-align:center;
+  color:white;
+}
+input{
+  width:100%;
+  padding:12px;
+  margin:10px 0;
+  border-radius:25px;
+  border:none;
+}
+button{
+  width:100%;
+  padding:12px;
+  border-radius:25px;
+  border:none;
+  background:#ff4f8b;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
 </style>
 </head>
+
 <body>
-<div class="card">
-<h2>🔐 Login</h2>
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
-<button onclick="login()">Login</button>
-<p><a href="signup.html">Create Account</a></p>
+
+<div class="glass">
+  <h2>Welcome Back ❤️</h2>
+
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+
+  <button onclick="login()">Login</button>
 </div>
 
+<!-- 🔥 FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyDuAZOFqpyZoSH1FlbZ1G7O8YcNX63yDtM",
@@ -30,20 +66,19 @@ const firebaseConfig = {
   projectId: "clark-online-dating",
   storageBucket: "clark-online-dating.firebasestorage.app",
   messagingSenderId: "63074718758",
-  appId: "1:63074718758:web:6af5283a9cdbbc1cef82e7",
-  measurementId: "G-5NLJTXQMPY"
+  appId: "1:63074718758:web:6af5283a9cdbbc1cef82e7"
 };
 firebase.initializeApp(firebaseConfig);
-</script>
 
-<script>
 function login(){
-  const emailVal = document.getElementById("email").value;
-  const passVal = document.getElementById("password").value;
-  firebase.auth().signInWithEmailAndPassword(emailVal, passVal)
-    .then(()=>{ window.location="chat.html"; })
-    .catch(e=>alert(e.message));
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  firebase.auth().signInWithEmailAndPassword(email,password)
+    .then(()=>window.location="chat.html")
+    .catch(err=>alert(err.message));
 }
 </script>
+
 </body>
 </html>
