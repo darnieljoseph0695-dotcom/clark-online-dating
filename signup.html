@@ -1,39 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Sign Up | Clark Dating</title>
 <style>
-body{
-  height:100vh;
-  margin:0;
-  display:flex; justify-content:center; align-items:center;
-  font-family:"Segoe UI";
-  background:url("darny.jpeg") no-repeat center/cover;
+body {
+  height: 100vh;
+  margin: 0;
+  display: flex; justify-content: center; align-items: center;
+  font-family: "Segoe UI";
+  background: url("darny.jpeg") no-repeat center/cover;
 }
-.glass{
-  width:90%; max-width:400px; padding:30px;
-  background:rgba(255,255,255,.15);
-  backdrop-filter:blur(10px); border-radius:20px;
-  text-align:center; color:white;
+.glass {
+  width: 90%; max-width: 400px; padding: 30px;
+  background: rgba(255,255,255,.15);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  text-align: center;
+  color: white;
 }
-input{ width:100%; padding:12px; margin:8px 0; border-radius:25px; border:none; }
-button{ width:100%; padding:12px; border-radius:25px; border:none; background:#ff4f8b; color:white; font-weight:bold; }
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 25px;
+  border: none;
+}
+button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 25px;
+  border: none;
+  background: #ff4f8b;
+  color: white;
+  font-weight: bold;
+}
 </style>
 </head>
 <body>
 
 <div class="glass">
-<h2>Create Account 💖</h2>
-<input id="email" type="email" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
-<input id="photo" type="file" accept="image/*">
-<button onclick="signup()">Sign Up</button>
-<p>Already have account? <a href="login.html" style="color:white;">Login</a></p>
+  <h2>Create Account 💖</h2>
+  <input id="email" type="email" placeholder="Email" />
+  <input id="password" type="password" placeholder="Password" />
+  <input id="photo" type="file" accept="image/*" />
+  <button onclick="signup()">Sign Up</button>
+  <p>Already have account? <a href="login.html" style="color:white;">Login</a></p>
 </div>
 
-<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -55,34 +70,44 @@ const auth = firebase.auth();
 const db = firebase.database();
 const storage = firebase.storage();
 
-function signup(){
-  const email = document.getElementById("email").value;
+function signup() {
+  const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   const file = document.getElementById("photo").files[0];
 
-  if(!email || !password || !file) return alert("All fields are required!");
+  if (!email || !password || !file) {
+    alert("All fields are required!");
+    return;
+  }
 
-  auth.createUserWithEmailAndPassword(email,password)
-  .then(cred=>{
-    const uid = cred.user.uid;
-    // Upload profile picture
-    const ref = storage.ref("profiles/"+uid);
-    ref.put(file).then(()=>{
-      ref.getDownloadURL().then(url=>{
-        // Save user info in Realtime Database
-        db.ref("users/"+uid).set({
-          uid: uid,
-          email: email,
-          photoURL: url
-        }).then(()=>{
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(cred => {
+      const uid = cred.user.uid;
+      const storageRef = storage.ref("profiles/" + uid);
+      storageRef.put(file)
+        .then(() => storageRef.getDownloadURL())
+        .then(url => {
+          return db.ref("users/" + uid).set({
+            uid: uid,
+            email: email,
+            photoURL: url
+          });
+        })
+        .then(() => {
           alert("Account created successfully!");
-          window.location="login.html";
+          window.location = "login.html";
+        })
+        .catch(error => {
+          console.error("Error saving user data:", error);
+          alert("Failed to save user data.");
         });
-      });
+    })
+    .catch(error => {
+      console.error("Error creating user:", error);
+      alert(error.message);
     });
-  })
-  .catch(err=>alert(err.message));
 }
 </script>
+
 </body>
 </html>
