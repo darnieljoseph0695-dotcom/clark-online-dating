@@ -168,7 +168,7 @@ async function loadUsers() {
     const div = document.createElement("div");
     div.className = "user-item";
     div.onclick = () => selectUser(user);
-    div.innerHTML = `<img src="${user.photoURL || "default-profile.png"}" /> <span>${user.email || user.username}</span>`;
+    div.innerHTML = `<img src="${user.photoURL || "default-profile.png"}" /> <span>${user.username || user.email}</span>`;
     div.id = user.uid;
     usersList.appendChild(div);
   });
