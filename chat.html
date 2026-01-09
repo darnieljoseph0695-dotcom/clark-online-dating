@@ -1,93 +1,141 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Chat | Clark Dating</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-body{
-  height:100vh;
-  background:url("darny.jpeg") no-repeat center/cover;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-family:"Segoe UI";
-}
-.chat{
-  width:95%;
-  max-width:420px;
-  height:85vh;
-  background:rgba(255,255,255,.15);
-  backdrop-filter:blur(12px);
-  border-radius:20px;
-  display:flex;
-  flex-direction:column;
-  color:white;
-}
-header{
-  padding:15px;
-  text-align:center;
-  border-bottom:1px solid rgba(255,255,255,.3);
-}
-.messages{
-  flex:1;
-  padding:15px;
-  overflow-y:auto;
-}
-input{
-  padding:10px;
-  border-radius:20px;
-  border:none;
-  width:70%;
-}
-button{
-  padding:10px 15px;
-  border-radius:20px;
-  border:none;
-  background:#ff4f8b;
-  color:white;
-}
-</style>
+  <title>Chat | Clark Dating</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body{
+      height:100vh;
+      background:url("darny.jpeg") no-repeat center/cover;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      font-family:"Segoe UI";
+    }
+    .chat{
+      width:95%;
+      max-width:420px;
+      height:85vh;
+      background:rgba(255,255,255,.15);
+      backdrop-filter:blur(12px);
+      border-radius:20px;
+      display:flex;
+      flex-direction:column;
+      color:white;
+    }
+    header{
+      padding:15px;
+      text-align:center;
+      border-bottom:1px solid rgba(255,255,255,.3);
+    }
+    .messages{
+      flex:1;
+      padding:15px;
+      overflow-y:auto;
+    }
+    .msg{
+      margin-bottom:10px;
+      padding:10px 15px;
+      border-radius:20px;
+      max-width:80%;
+    }
+    .me{
+      background:#ff4f8b;
+      margin-left:auto;
+    }
+    .other{
+      background:rgba(255,255,255,.35);
+    }
+    .input-box{
+      display:flex;
+      gap:10px;
+      padding:10px;
+    }
+    input{
+      flex:1;
+      padding:10px;
+      border-radius:20px;
+      border:none;
+    }
+    button{
+      padding:10px 15px;
+      border-radius:20px;
+      border:none;
+      background:#ff4f8b;
+      color:white;
+    }
+  </style>
 </head>
 
 <body>
 
 <div class="chat">
-<header>
-💬 Clark Chat
-<button style="float:right" onclick="logout()">Logout</button>
-</header>
+  <header>
+    💬 Clark Dating Chat
+    <button style="float:right" onclick="logout()">Logout</button>
+  </header>
 
-<div class="messages"></div>
+  <div class="messages" id="messages"></div>
 
-<div style="padding:10px;">
-<input placeholder="Type message...">
-<button>Send</button>
-</div>
+  <div class="input-box">
+    <input id="text" placeholder="Type message...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
 </div>
 
 <!-- 🔥 FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyDuAZOFqpyZoSH1FlbZ1G7O8YcNX63yDtM",
   authDomain: "clark-online-dating.firebaseapp.com",
+  databaseURL: "https://clark-online-dating-default-rtdb.firebaseio.com",
   projectId: "clark-online-dating",
   storageBucket: "clark-online-dating.firebasestorage.app",
   messagingSenderId: "63074718758",
   appId: "1:63074718758:web:6af5283a9cdbbc1cef82e7"
 };
+
 firebase.initializeApp(firebaseConfig);
 
+const auth = firebase.auth();
+const db = firebase.database();
+
 // 🔒 Protect page
-firebase.auth().onAuthStateChanged(user=>{
-  if(!user) window.location="login.html";
+auth.onAuthStateChanged(user => {
+  if(!user) window.location = "login.html";
 });
 
+// 🔥 Send message
+function sendMessage(){
+  const text = document.getElementById("text").value;
+  if(text === "") return;
+
+  db.ref("messages").push({
+    user: auth.currentUser.email,
+    text: text,
+    time: Date.now()
+  });
+
+  document.getElementById("text").value = "";
+}
+
+// 🔥 Receive messages
+db.ref("messages").on("child_added", snapshot => {
+  const msg = snapshot.val();
+  const div = document.createElement("div");
+  div.className = "msg " + (msg.user === auth.currentUser.email ? "me" : "other");
+  div.innerText = msg.text;
+  document.getElementById("messages").appendChild(div);
+  document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
+});
+
+// 🔐 Logout
 function logout(){
-  firebase.auth().signOut().then(()=>window.location="login.html");
+  auth.signOut().then(()=>window.location="login.html");
 }
 </script>
 
