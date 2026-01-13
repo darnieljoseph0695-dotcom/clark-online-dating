@@ -1,95 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Login | Clark Dating</title>
-<style>
-body {
-  height: 100vh;
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: "Segoe UI";
-  background: url("darny.jpeg") no-repeat center/cover;
-}
-.glass {
-  width: 90%;
-  max-width: 400px;
-  padding: 30px;
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  text-align: center;
-  color: white;
-}
-input {
-  width: 100%;
-  padding: 12px;
-  margin: 8px 0;
-  border-radius: 25px;
-  border: none;
-}
-button {
-  width: 100%;
-  padding: 12px;
-  border-radius: 25px;
-  border: none;
-  background: #ff4f8b;
-  color: white;
-  font-weight: bold;
-}
-</style>
+  <title>Login</title>
 </head>
 <body>
 
-<div class="glass">
-  <h2>Login 💖</h2>
-  <input id="email" type="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <p>Don't have account? <a href="signup.html" style="color:white;">Sign Up</a></p>
-</div>
+<h3>Login / Register</h3>
 
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<input type="email" id="email" placeholder="Email"><br><br>
+<input type="password" id="password" placeholder="Password"><br><br>
 
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyDuAZOFqpyZoSH1FlbZ1G7O8YcNX63yDtM",
-  authDomain: "clark-online-dating.firebaseapp.com",
-  projectId: "clark-online-dating",
-  storageBucket: "clark-online-dating.appspot.com",
-  messagingSenderId: "63074718758",
-  appId: "1:63074718758:web:6af5283a9cdbbc1cef82e7"
-};
+<button id="register">Register</button>
+<button id="login">Login</button>
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
+    from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-auth.onAuthStateChanged(user => {
-  if (user) {
-    // User is already logged in, redirect to chat
-    window.location = "chat.html";
-  }
-});
+  const firebaseConfig = {
+    apiKey: "AIzaSyD_FcmcZpcCix8JMrP49w-KZd1N3c_EWho",
+    authDomain: "clark-dating.firebaseapp.com",
+    projectId: "clark-dating",
+    appId: "1:274706009108:web:6e7309d20e788bc790ab01"
+  };
 
-function login() {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-  if (!email || !password) return alert("All fields are required!");
+  register.onclick = () => {
+    createUserWithEmailAndPassword(auth, email.value, password.value)
+      .then(() => location = "chat.html")
+      .catch(e => alert(e.message));
+  };
 
-  auth.signInWithEmailAndPassword(email, password)
-    .then(() => {
-      window.location = "chat.html";
-    })
-    .catch(err => alert(err.message));
-}
+  login.onclick = () => {
+    signInWithEmailAndPassword(auth, email.value, password.value)
+      .then(() => location = "chat.html")
+      .catch(e => alert(e.message));
+  };
 </script>
 
 </body>
