@@ -2,24 +2,37 @@
 <html lang="sw">
 <head>
 <meta charset="UTF-8">
-<title>Clark Online Dating – Chat</title>
+<title>Clark Private Chat</title>
 <style>
-body{margin:0;font-family:Arial;text-align:center;overflow:hidden;}
-.bgDiv{position:fixed;inset:0;background-size:cover;opacity:0;transition:1.5s;filter:blur(2px);z-index:-2;}
-.bgDiv.active{opacity:1;}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:-1;}
-header{background:rgba(255,77,109,.8);color:white;padding:15px;}
-.chatBox{
-  margin:30px auto;background:rgba(255,255,255,.85);
-  width:90%;max-width:600px;padding:15px;border-radius:8px;
-}
-#messages{height:300px;overflow:auto;border:1px solid #ccc;padding:5px;margin:10px 0;}
-input,select,button{padding:8px;margin:3px;width:90%;}
-button{background:#ff4d6d;color:white;border:none;cursor:pointer;}
+body {margin:0; font-family:Arial, sans-serif; text-align:center; overflow:hidden;}
+
+/* Background */
+.bgDiv {position:fixed; inset:0; background-size:cover; background-position:center; opacity:0; transition:1.5s; filter:blur(2px); z-index:-2;}
+.bgDiv.active {opacity:1;}
+.overlay {position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:-1;}
+
+/* Header */
+header {background:rgba(255,77,109,.8); color:white; padding:15px; display:flex; justify-content:space-between; align-items:center;}
+header h2 {margin:0;}
+header button {padding:8px 15px; background:#fff; color:#ff4d6d; border:none; cursor:pointer; border-radius:5px;}
+
+/* Chat container */
+.chatBox {margin:20px auto; width:90%; max-width:600px; padding:15px; background:rgba(255,255,255,.85); border-radius:8px; text-align:left;}
+#users {width:100%; padding:8px; margin-bottom:10px;}
+#messages {height:400px; overflow-y:auto; scroll-behavior:smooth; padding:10px; border-radius:8px; background:rgba(255,255,255,0.85); border:1px solid #ccc;}
+input, button {padding:8px; margin:3px;}
+input {width:75%;}
+button {width:22%; background:#ff4d6d; color:white; border:none; cursor:pointer; border-radius:5px;}
+
+/* WhatsApp style bubbles */
+.bubble {padding:8px; margin:5px 0; max-width:70%; border-radius:15px; word-wrap:break-word;}
+.bubble.self {background:#dcf8c6; text-align:right; margin-left:auto; border-radius:15px 15px 0 15px;}
+.bubble.other {background:#fff; border:1px solid #ccc; text-align:left; margin-right:auto; border-radius:15px 15px 15px 0;}
 </style>
 </head>
 <body>
 
+<!-- Background Divs -->
 <div id="bg1" class="bgDiv"></div>
 <div id="bg2" class="bgDiv"></div>
 <div class="overlay"></div>
@@ -32,17 +45,16 @@ button{background:#ff4d6d;color:white;border:none;cursor:pointer;}
 <div class="chatBox">
   <select id="users"></select>
   <div id="messages"></div>
-  <input id="msg" placeholder="Message">
+  <input id="msg" placeholder="Type a message...">
   <button id="send">Send</button>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } 
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } 
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+// --- Firebase config ---
 const firebaseConfig = {
  apiKey:"AIzaSyD_FcmcZpcCix8JMrP49w-KZd1N3c_EWho",
  authDomain:"clark-dating.firebaseapp.com",
@@ -50,43 +62,83 @@ const firebaseConfig = {
  appId:"1:274706009108:web:6e7309d20e788bc790ab01"
 };
 
-const app=initializeApp(firebaseConfig);
-const auth=getAuth(app);
-const db=getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-let me;
+let me;               // current user UID
+let selectedUserId;   // user chatting with
+let messagesUnsub;    // unsubscribe snapshot
 
-onAuthStateChanged(auth,u=>{
- if(!u) location="login.html";
- me=u.uid;
- loadMessages();
+// --- Auth listener ---
+onAuthStateChanged(auth, async user => {
+ if(!user) location="login.html";
+ me = user.uid;
+ loadUsers();
 });
 
-logout.onclick=()=>signOut(auth);
+// --- Logout ---
+logout.onclick = ()=>signOut(auth);
 
-send.onclick=async()=>{
- const m=msg.value.trim(); if(!m) return;
- await addDoc(collection(db,"publicMessages"),{
-   from:me,message:m,timestamp:Date.now()
+// --- Load users into select ---
+async function loadUsers(){
+ const select = document.getElementById("users");
+ select.innerHTML = "";
+ const snap = await getDocs(collection(db,"users"));
+ snap.forEach(docSnap => {
+   if(docSnap.id !== me){
+     const u = docSnap.data();
+     const opt = document.createElement("option");
+     opt.value = docSnap.id;
+     opt.textContent = u.username || u.email || "Unnamed";
+     select.appendChild(opt);
+   }
  });
- msg.value="";
+ if(select.options.length>0){
+   selectedUserId = select.value;
+   loadMessages(selectedUserId);
+ }
+ select.onchange = ()=>{
+   selectedUserId = select.value;
+   loadMessages(selectedUserId);
+ };
+}
+
+// --- Send message ---
+send.onclick = async ()=>{
+ const m = msg.value.trim();
+ if(!m || !selectedUserId) return;
+ await addDoc(collection(db,"privateMessages"), {
+   participants: [me, selectedUserId],
+   fromUid: me,
+   message: m,
+   timestamp: Date.now()
+ });
+ msg.value = "";
 };
 
-function loadMessages(){
- const q=query(collection(db,"publicMessages"),orderBy("timestamp"));
- onSnapshot(q,snap=>{
-   messages.innerHTML="";
-   snap.forEach(doc=>{
-     const d=doc.data();
-     const div=document.createElement("div");
-     div.textContent=d.message;
-     messages.appendChild(div);
+// --- Load messages for two participants ---
+function loadMessages(otherUid){
+ const q = query(collection(db,"privateMessages"), orderBy("timestamp"));
+ if(messagesUnsub) messagesUnsub();
+ messagesUnsub = onSnapshot(q, snap => {
+   const div = document.getElementById("messages");
+   div.innerHTML = "";
+   snap.forEach(docSnap=>{
+     const d = docSnap.data();
+     // Only show messages between me and selected user
+     if(d.participants.includes(me) && d.participants.includes(otherUid)){
+       const b = document.createElement("div");
+       b.textContent = d.message;
+       b.classList.add("bubble", d.fromUid===me ? "self" : "other");
+       div.appendChild(b);
+     }
    });
-   messages.scrollTop=messages.scrollHeight;
+   div.scrollTop = div.scrollHeight;
  });
 }
 
-/* Background crossfade */
+// --- Background crossfade ---
 const images = [
   "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg",
   "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg",
@@ -99,7 +151,7 @@ function bg(){
  if(cur===1){b.style.backgroundImage=`url(${img})`;b.classList.add("active");a.classList.remove("active");cur=2;}
  else{a.style.backgroundImage=`url(${img})`;a.classList.add("active");b.classList.remove("active");cur=1;}
 }
-bg();setInterval(bg,5000);
+bg(); setInterval(bg,5000);
 </script>
 </body>
 </html>
