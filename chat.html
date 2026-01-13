@@ -1,60 +1,157 @@
 <!DOCTYPE html>
-<html lang="sw">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Clark Online Dating – Private Chat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clark Chat</title>
+
 <style>
-body{margin:0;font-family:Arial;text-align:center;overflow:hidden;}
-.bgDiv{position:fixed;inset:0;background-size:cover;opacity:0;transition:1.5s;filter:blur(2px);z-index:-2;}
-.bgDiv.active{opacity:1;}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:-1;}
-header{background:rgba(255,77,109,.8);color:white;padding:15px;display:flex;justify-content:space-between;align-items:center;}
-.chatContainer{display:flex;flex-direction:row;width:95%;max-width:900px;margin:20px auto;height:500px;background:rgba(255,255,255,.85);border-radius:8px;overflow:hidden;}
-.usersList{width:25%;border-right:1px solid #ccc;overflow-y:auto;padding:10px;background:#f7f7f7;}
-.usersList div{padding:10px;cursor:pointer;border-bottom:1px solid #ddd;}
-.usersList div:hover{background:#eee;}
-.chatBox{flex:1;display:flex;flex-direction:column;padding:10px;justify-content:flex-end;position:relative;}
-#messages{flex:1;overflow-y:auto;margin-bottom:10px;}
-.bubble{max-width:70%;padding:8px;margin:5px;border-radius:15px;word-wrap:break-word;display:inline-block;clear:both;}
-.bubble.self{background:#dcf8c6;align-self:flex-end;border-radius:15px 15px 0 15px;margin-left:auto;}
-.bubble.other{background:#fff;border:1px solid #ccc;align-self:flex-start;border-radius:15px 15px 15px 0;margin-right:auto;}
-#msgInput{padding:10px;width:80%;border:1px solid #ccc;border-radius:8px;margin-right:5px;}
-#sendBtn{padding:10px 15px;background:#ff4d6d;color:white;border:none;border-radius:8px;cursor:pointer;}
-#inputContainer{display:flex;justify-content:flex-start;}
+*{box-sizing:border-box;font-family:Arial}
+body{margin:0;background:#ece5dd;height:100vh}
+
+/* TOP BAR */
+.topbar{
+ background:#075e54;
+ color:white;
+ padding:15px;
+ font-weight:bold;
+}
+
+/* APP LAYOUT */
+.app{
+ display:flex;
+ height:calc(100vh - 50px);
+}
+
+/* CHAT LIST */
+.chat-list{
+ width:100%;
+ background:white;
+ overflow-y:auto;
+}
+.chat-item{
+ padding:15px;
+ border-bottom:1px solid #eee;
+ cursor:pointer;
+}
+.chat-item strong{display:block}
+
+/* CHAT WINDOW */
+.chat-window{
+ position:fixed;
+ inset:0;
+ background:#ece5dd;
+ display:flex;
+ flex-direction:column;
+}
+.chat-window.hidden{display:none}
+
+.chat-header{
+ background:#075e54;
+ color:white;
+ padding:10px;
+ display:flex;
+ align-items:center;
+ gap:10px;
+}
+
+/* MESSAGES */
+.messages{
+ flex:1;
+ padding:10px;
+ overflow-y:auto;
+}
+.bubble{
+ max-width:75%;
+ padding:8px 12px;
+ margin:4px 0;
+ border-radius:8px;
+ font-size:14px;
+}
+.self{
+ background:#dcf8c6;
+ margin-left:auto;
+}
+.other{
+ background:white;
+}
+
+/* INPUT */
+.input-area{
+ display:flex;
+ padding:8px;
+ background:#f0f0f0;
+}
+.input-area input{
+ flex:1;
+ padding:10px;
+ border-radius:20px;
+ border:none;
+ outline:none;
+}
+.input-area button{
+ margin-left:5px;
+ background:#075e54;
+ color:white;
+ border:none;
+ border-radius:50%;
+ width:40px;
+ height:40px;
+ cursor:pointer;
+}
+
+/* DESKTOP */
+@media(min-width:768px){
+ .chat-list{width:30%}
+ .chat-window{
+  position:relative;
+  width:70%;
+ }
+ .chat-window.hidden{display:flex}
+ #backBtn{display:none}
+}
 </style>
 </head>
+
 <body>
 
-<div id="bg1" class="bgDiv"></div>
-<div id="bg2" class="bgDiv"></div>
-<div class="overlay"></div>
+<div class="topbar">Clark Chat</div>
 
-<header>
-  <h2>Clark Private Chat</h2>
-  <button id="logoutBtn">Logout</button>
-</header>
+<div class="app">
 
-<div class="chatContainer">
-  <div class="usersList" id="usersList">Loading users...</div>
-  <div class="chatBox">
-    <div id="messages"></div>
-    <div id="inputContainer">
-      <input type="text" id="msgInput" placeholder="Write a message...">
-      <button id="sendBtn">Send</button>
+  <div class="chat-list" id="chatList">
+    Loading chats...
+  </div>
+
+  <div class="chat-window hidden" id="chatWindow">
+    <div class="chat-header">
+      <button id="backBtn">←</button>
+      <span id="chatName">Chat</span>
+    </div>
+
+    <div class="messages" id="messages"></div>
+
+    <div class="input-area">
+      <input id="msgInput" placeholder="Message">
+      <button id="sendBtn">➤</button>
     </div>
   </div>
+
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+ getFirestore, collection, query, where,
+ orderBy, onSnapshot, addDoc, doc, setDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+/* 🔥 FIREBASE CONFIG — BADILISHA HAPA */
 const firebaseConfig = {
- apiKey:"AIzaSyD_FcmcZpcCix8JMrP49w-KZd1N3c_EWho",
- authDomain:"clark-dating.firebaseapp.com",
- projectId:"clark-dating",
- appId:"1:274706009108:web:6e7309d20e788bc790ab01"
+ apiKey: "YOUR_API_KEY",
+ authDomain: "YOUR_DOMAIN",
+ projectId: "YOUR_PROJECT_ID"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -62,90 +159,101 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 let me = null;
-let selectedUser = null;
+let currentChat = null;
 
-// Logout
-logoutBtn.onclick = ()=>signOut(auth);
+function convoId(a,b){
+ return [a,b].sort().join("_");
+}
 
-// Auth check
+/* AUTH */
 onAuthStateChanged(auth,user=>{
-  if(!user){ location="login.html"; return; }
-  me = user.uid;
-  loadUsers();
+ if(!user){
+  alert("Login first");
+  return;
+ }
+ me = user.uid;
+ loadChats();
 });
 
-// Load users for private chat
-async function loadUsers(){
-  const snap = await getDocs(collection(db,"users"));
-  const list = document.getElementById("usersList");
-  list.innerHTML = "";
-  snap.forEach(docSnap=>{
-    if(docSnap.id===me) return; // skip self
-    const u = docSnap.data();
-    const div = document.createElement("div");
-    div.textContent = u.username || u.email;
-    div.onclick = ()=>selectUser(docSnap.id, u.username);
-    list.appendChild(div);
+/* LOAD CHAT LIST */
+function loadChats(){
+ const q = query(
+  collection(db,"conversations"),
+  where("participants","array-contains",me),
+  orderBy("lastTimestamp","desc")
+ );
+
+ onSnapshot(q,snap=>{
+  chatList.innerHTML="";
+  snap.forEach(d=>{
+   const c=d.data();
+   const other=c.participants.find(u=>u!==me);
+   const div=document.createElement("div");
+   div.className="chat-item";
+   div.innerHTML=`
+     <strong>${other}</strong>
+     <small>${c.lastMessage||""}</small>
+   `;
+   div.onclick=()=>openChat(other);
+   chatList.appendChild(div);
   });
+ });
 }
 
-// When user selected
-function selectUser(uid, username){
-  selectedUser = uid;
-  loadMessages();
+/* OPEN CHAT */
+function openChat(uid){
+ currentChat = uid;
+ chatName.textContent = uid;
+ chatWindow.classList.remove("hidden");
+ loadMessages();
 }
 
-// Load private messages
-let unsubMessages = null;
+/* LOAD MESSAGES */
 function loadMessages(){
-  if(!selectedUser) return;
-  if(unsubMessages) unsubMessages();
-  const q = query(collection(db,"privateMessages"), orderBy("timestamp"));
-  const msgDiv = document.getElementById("messages");
-  unsubMessages = onSnapshot(q, snap=>{
-    msgDiv.innerHTML = "";
-    snap.forEach(doc=>{
-      const m = doc.data();
-      if(m.participants.includes(me) && m.participants.includes(selectedUser)){
-        const b = document.createElement("div");
-        b.classList.add("bubble", m.fromUid===me?"self":"other");
-        b.textContent = m.fromUsername+": "+m.message;
-        msgDiv.appendChild(b);
-      }
-    });
-    msgDiv.scrollTop = msgDiv.scrollHeight;
+ const id = convoId(me,currentChat);
+ const q = query(
+  collection(db,"conversations",id,"messages"),
+  orderBy("timestamp")
+ );
+
+ onSnapshot(q,snap=>{
+  messages.innerHTML="";
+  snap.forEach(d=>{
+   const m=d.data();
+   const b=document.createElement("div");
+   b.className="bubble "+(m.from===me?"self":"other");
+   b.textContent=m.text;
+   messages.appendChild(b);
   });
+  messages.scrollTop=messages.scrollHeight;
+ });
 }
 
-// Send message
+/* SEND MESSAGE */
 sendBtn.onclick = async()=>{
-  if(!selectedUser) return alert("Select a user first");
-  const text = msgInput.value.trim();
-  if(!text) return;
-  await addDoc(collection(db,"privateMessages"),{
-    fromUid: me,
-    fromUsername: auth.currentUser.email, // replace with username if stored
-    participants: [me, selectedUser],
-    message: text,
-    timestamp: Date.now()
-  });
-  msgInput.value = "";
-}
+ const text = msgInput.value.trim();
+ if(!text || !currentChat) return;
 
-// Background crossfade
-const images = [
-  "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg",
-  "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg",
-  "https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg",
-  "https://images.pexels.com/photos/3769713/pexels-photo-3769713.jpeg"
-];
-let i=0,cur=1;
-function bg(){
- const a=bg1,b=bg2,img=images[i++%images.length];
- if(cur===1){b.style.backgroundImage=`url(${img})`;b.classList.add("active");a.classList.remove("active");cur=2;}
- else{a.style.backgroundImage=`url(${img})`;a.classList.add("active");b.classList.remove("active");cur=1;}
-}
-bg(); setInterval(bg,5000);
+ const id = convoId(me,currentChat);
+
+ await addDoc(collection(db,"conversations",id,"messages"),{
+  from: me,
+  text: text,
+  timestamp: serverTimestamp(),
+  seen:false
+ });
+
+ await setDoc(doc(db,"conversations",id),{
+  participants:[me,currentChat],
+  lastMessage:text,
+  lastTimestamp:serverTimestamp()
+ },{merge:true});
+
+ msgInput.value="";
+};
+
+backBtn.onclick=()=>chatWindow.classList.add("hidden");
 </script>
+
 </body>
 </html>
