@@ -1,189 +1,71 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clark Dating Chat</title>
-<style>
-body{
-  margin:0; padding:0; font-family:"Segoe UI";
-  height:100vh;
-  background:url("darny.jpeg") no-repeat center/cover;
-  display:flex; justify-content:center; align-items:center;
-}
-.chat-container{
-  width:95%; max-width:900px; height:85vh;
-  display:flex; background:rgba(255,255,255,.15);
-  backdrop-filter:blur(12px); border-radius:20px; overflow:hidden;
-}
-.sidebar{
-  width:30%; border-right:1px solid rgba(255,255,255,.3);
-  overflow-y:auto; background:rgba(255,255,255,.1);
-}
-.sidebar h3{ padding:10px; text-align:center; color:white; }
-.user-item{
-  display:flex; align-items:center; padding:10px;
-  cursor:pointer; border-bottom:1px solid rgba(255,255,255,.2);
-}
-.user-item img{
-  width:40px; height:40px; border-radius:50%; margin-right:10px;
-}
-.user-item span{ color:white; }
-.user-item.active{ background:rgba(255,255,255,.2); }
-
-.chat-area{
-  flex:1; display:flex; flex-direction:column; justify-content:space-between;
-}
-.chat-header{
-  padding:10px; border-bottom:1px solid rgba(255,255,255,.3);
-  color:white; font-weight:bold;
-}
-.messages{
-  flex:1; padding:10px; overflow-y:auto;
-}
-.msg{ padding:10px 15px; margin-bottom:10px; border-radius:20px; max-width:70%; word-wrap: break-word; }
-.msg.me{ background:#ff4f8b; margin-left:auto; color:white; }
-.msg.other{ background:rgba(255,255,255,.35); margin-right:auto; color:white; }
-
-.input-box{
-  display:flex; padding:10px; border-top:1px solid rgba(255,255,255,.3);
-}
-.input-box input{
-  flex:1; padding:10px; border-radius:20px; border:none;
-}
-.input-box button{
-  padding:10px 15px; border-radius:20px; border:none;
-  background:#ff4f8b; color:white;
-}
-</style>
+  <title>Clark Chat</title>
 </head>
 <body>
 
-<div class="chat-container">
-  <div class="sidebar">
-    <h3>Users</h3>
-    <div id="users-list"></div>
-  </div>
+<h3>Private Chat</h3>
 
-  <div class="chat-area">
-    <div class="chat-header" id="chat-header">Select a user</div>
-    <div class="messages" id="messages"></div>
-    <div class="input-box">
-      <input id="text" placeholder="Type a message...">
-      <button onclick="sendMessage()">Send</button>
-    </div>
-  </div>
-</div>
+<select id="users"></select>
+<div id="chat" style="border:1px solid #ccc;height:300px;overflow:auto"></div>
 
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<input id="msg" placeholder="Message">
+<button id="send">Send</button>
+<button id="logout">Logout</button>
 
-<script>
-// 🔥 CONFIG
-const firebaseConfig = {
-  apiKey: "AIzaSyDuAZOFqpyZoSH1FlbZ1G7O8YcNX63yDtM",
-  authDomain: "clark-online-dating.firebaseapp.com",
-  projectId: "clark-online-dating",
-  storageBucket: "clark-online-dating.firebasestorage.app",
-  messagingSenderId: "63074718758",
-  appId: "1:63074718758:web:6af5283a9cdbbc1cef82e7"
-};
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } 
+    from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+  import { getDatabase, ref, push, onChildAdded, get } 
+    from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+  const firebaseConfig = {
+    apiKey: "AIzaSyD_FcmcZpcCix8JMrP49w-KZd1N3c_EWho",
+    authDomain: "clark-dating.firebaseapp.com",
+    databaseURL: "https://clark-dating-default-rtdb.firebaseio.com",
+    projectId: "clark-dating",
+    appId: "1:274706009108:web:6e7309d20e788bc790ab01"
+  };
 
-let currentUser = null;
-let selectedUser = null;
-let unsubscribeMessages = null;
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
 
-// Protect page
-auth.onAuthStateChanged(user=>{
-  if(!user) window.location="login.html";
-  else{
-    currentUser = user;
-    loadUsers();
-  }
-});
+  let me, chatId;
 
-// Load users for sidebar
-function loadUsers(){
-  db.collection("users").get().then(snapshot=>{
-    const usersList = document.getElementById("users-list");
-    usersList.innerHTML = "";
-    snapshot.forEach(doc=>{
-      const user = doc.data();
-      if(user.uid === currentUser.uid) return; // skip self
-      const div = document.createElement("div");
-      div.className="user-item";
-      div.id=user.uid;
-      div.onclick=()=>selectUser(user);
-      div.innerHTML=`<img src="${user.photoURL}" /> <span>${user.username}</span>`;
-      usersList.appendChild(div);
+  onAuthStateChanged(auth, async user => {
+    if (!user) location = "login.html";
+    me = user.uid;
+
+    const snap = await get(ref(db, "users"));
+    users.innerHTML = "";
+    snap.forEach(u => {
+      if (u.key !== me) {
+        users.innerHTML += `<option value="${u.key}">${u.key}</option>`;
+      }
     });
   });
-}
 
-// Generate consistent chat ID
-function generateChatId(uid1, uid2){
-  return uid1 < uid2 ? uid1+"_"+uid2 : uid2+"_"+uid1;
-}
-
-// Select user
-function selectUser(user){
-  selectedUser=user;
-  document.getElementById("chat-header").innerText=user.username;
-  document.getElementById("messages").innerHTML="";
-  document.querySelectorAll(".user-item").forEach(u=>u.classList.remove("active"));
-  document.getElementById(user.uid).classList.add("active");
-
-  if(unsubscribeMessages) unsubscribeMessages(); // remove old listener
-
-  const chatId = generateChatId(currentUser.uid, selectedUser.uid);
-
-  // Listen messages in realtime
-  unsubscribeMessages = db.collection("chats").doc(chatId)
-    .collection("messages")
-    .orderBy("time")
-    .onSnapshot(snapshot=>{
-      const messagesDiv = document.getElementById("messages");
-      messagesDiv.innerHTML="";
-      snapshot.forEach(doc=>displayMessage(doc.data()));
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  users.onchange = () => {
+    chat.innerHTML = "";
+    chatId = [me, users.value].sort().join("_");
+    onChildAdded(ref(db, "chats/" + chatId), s => {
+      chat.innerHTML += `<p>${s.val().text}</p>`;
     });
-}
+  };
 
-// Display message
-function displayMessage(msg){
-  const div = document.createElement("div");
-  div.className = msg.sender===currentUser.uid?"msg me":"msg other";
-  div.innerText = msg.text;
-  document.getElementById("messages").appendChild(div);
-}
+  send.onclick = () => {
+    push(ref(db, "chats/" + chatId), {
+      text: msg.value,
+      sender: me
+    });
+    msg.value = "";
+  };
 
-// Send message
-function sendMessage(){
-  if(!selectedUser) return alert("Select a user first!");
-  const text = document.getElementById("text").value.trim();
-  if(!text) return;
-
-  const chatId = generateChatId(currentUser.uid, selectedUser.uid);
-  const chatRef = db.collection("chats").doc(chatId);
-
-  // Ensure chat doc exists
-  chatRef.set({ users: [currentUser.uid, selectedUser.uid] }, { merge:true });
-
-  // Add message
-  chatRef.collection("messages").add({
-    sender: currentUser.uid,
-    text: text,
-    time: firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-  document.getElementById("text").value="";
-}
+  logout.onclick = () => signOut(auth);
 </script>
+
 </body>
 </html>
