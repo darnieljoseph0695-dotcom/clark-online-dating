@@ -9,7 +9,6 @@
 *{box-sizing:border-box;font-family:Arial}
 body{margin:0;background:#dadbd3;height:100vh}
 
-/* MAIN LAYOUT */
 .whatsapp{
  display:flex;
  height:100vh;
@@ -51,6 +50,18 @@ body{margin:0;background:#dadbd3;height:100vh}
  height:40px;
  background:#bbb;
  border-radius:50%;
+ position:relative;
+}
+
+.online-dot{
+ width:10px;
+ height:10px;
+ border-radius:50%;
+ background:green;
+ position:absolute;
+ bottom:0;
+ right:0;
+ border:2px solid white;
 }
 
 /* CHAT AREA */
@@ -90,9 +101,7 @@ body{margin:0;background:#dadbd3;height:100vh}
  background:#dcf8c6;
  margin-left:auto;
 }
-.other{
- background:white;
-}
+.other{background:white}
 
 /* INPUT */
 .input-area{
@@ -123,10 +132,7 @@ body{margin:0;background:#dadbd3;height:100vh}
 /* MOBILE */
 @media(max-width:768px){
  .sidebar{width:100%}
- .chat-area{
-  position:fixed;
-  inset:0;
- }
+ .chat-area{position:fixed;inset:0}
 }
 </style>
 </head>
@@ -141,11 +147,14 @@ body{margin:0;background:#dadbd3;height:100vh}
     <div class="user-list" id="chatList">Loading users...</div>
   </div>
 
-  <!-- CHAT AREA -->
+  <!-- CHAT -->
   <div class="chat-area hidden" id="chatWindow">
     <div class="chat-header">
       <div class="avatar"></div>
-      <strong id="chatName">User</strong>
+      <div>
+        <strong id="chatName">User</strong><br>
+        <small id="chatStatus">offline</small>
+      </div>
     </div>
 
     <div class="messages" id="messages"></div>
@@ -163,10 +172,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import {
  getFirestore, collection, query, orderBy,
- onSnapshot, addDoc, doc, setDoc, serverTimestamp
+ onSnapshot, addDoc, doc, setDoc,
+ updateDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* 🔥 BADILISHA HIZI */
+/* 🔥 BADILISHA HAPA */
 const firebaseConfig = {
  apiKey: "YOUR_API_KEY",
  authDomain: "YOUR_DOMAIN",
@@ -177,33 +187,46 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let me = null;
-let currentChat = null;
-let unsubMessages = null;
+let me=null, currentChat=null, unsubMessages=null, unsubStatus=null;
 
-const chatList = document.getElementById("chatList");
-const chatWindow = document.getElementById("chatWindow");
-const chatName = document.getElementById("chatName");
-const messages = document.getElementById("messages");
-const msgInput = document.getElementById("msgInput");
-const sendBtn = document.getElementById("sendBtn");
+const chatList=document.getElementById("chatList");
+const chatWindow=document.getElementById("chatWindow");
+const chatName=document.getElementById("chatName");
+const chatStatus=document.getElementById("chatStatus");
+const messages=document.getElementById("messages");
+const msgInput=document.getElementById("msgInput");
+const sendBtn=document.getElementById("sendBtn");
 
-const convoId = (a,b)=>[a,b].sort().join("_");
+const convoId=(a,b)=>[a,b].sort().join("_");
 
-/* AUTH */
+/* AUTH + ONLINE */
 onAuthStateChanged(auth,user=>{
  if(!user){
-  alert("Please login first");
+  alert("Login first");
   return;
  }
- me = user.uid;
+ me=user.uid;
+
+ const myRef=doc(db,"users",me);
+
+ updateDoc(myRef,{
+  status:"online",
+  lastSeen:serverTimestamp()
+ });
+
+ window.addEventListener("beforeunload",()=>{
+  updateDoc(myRef,{
+   status:"offline",
+   lastSeen:serverTimestamp()
+  });
+ });
+
  loadUsers();
 });
 
-/* LOAD USERS SIDEBAR */
+/* LOAD USERS */
 function loadUsers(){
- const q = query(collection(db,"users"));
-
+ const q=query(collection(db,"users"));
  onSnapshot(q,snap=>{
   chatList.innerHTML="";
   snap.forEach(d=>{
@@ -212,13 +235,17 @@ function loadUsers(){
 
    const div=document.createElement("div");
    div.className="chat-item";
+
    div.innerHTML=`
-     <div class="avatar"></div>
-     <div>
-       <strong>${u.name||"User"}</strong><br>
-       <small>${u.status||""}</small>
-     </div>
+    <div class="avatar">
+      ${u.status==="online" ? '<div class="online-dot"></div>' : ''}
+    </div>
+    <div>
+      <strong>${u.name||"User"}</strong><br>
+      <small>${u.status==="online"?"Online":"Offline"}</small>
+    </div>
    `;
+
    div.onclick=()=>openChat(d.id,u.name||"User");
    chatList.appendChild(div);
   });
@@ -230,7 +257,22 @@ function openChat(uid,name){
  currentChat=uid;
  chatName.textContent=name;
  chatWindow.classList.remove("hidden");
+ watchStatus(uid);
  loadMessages();
+}
+
+/* WATCH ONLINE STATUS */
+function watchStatus(uid){
+ if(unsubStatus) unsubStatus();
+ const ref=doc(db,"users",uid);
+ unsubStatus=onSnapshot(ref,snap=>{
+  const u=snap.data();
+  if(!u) return;
+  chatStatus.textContent =
+   u.status==="online"
+    ? "online"
+    : "last seen " + new Date(u.lastSeen?.toDate()).toLocaleTimeString();
+ });
 }
 
 /* LOAD MESSAGES */
@@ -286,4 +328,3 @@ msgInput.addEventListener("keydown",e=>{
 
 </body>
 </html>
-
