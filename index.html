@@ -7,89 +7,111 @@
 
 <style>
 /* ===== RESET ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Segoe UI", sans-serif;
+*{
+ margin:0;
+ padding:0;
+ box-sizing:border-box;
+ font-family:"Segoe UI",sans-serif;
 }
 
-/* ===== BACKGROUND IMAGE ===== */
-body {
-  height: 100vh;
-  background: url("darny.jpeg") no-repeat center center/cover;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* ===== BACKGROUND ===== */
+body{
+ min-height:100vh;
+ background:
+  linear-gradient(
+   rgba(233,30,99,.45),
+   rgba(0,0,0,.55)
+  ),
+  url("darny.jpeg") no-repeat center/cover;
+ display:flex;
+ justify-content:center;
+ align-items:center;
 }
 
-/* ===== GLASS CONTAINER ===== */
-.glass {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 40px;
-  width: 90%;
-  max-width: 400px;
-  text-align: center;
-  color: white;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+/* ===== GLASS CARD ===== */
+.glass{
+ background:rgba(255,255,255,.18);
+ backdrop-filter:blur(14px);
+ -webkit-backdrop-filter:blur(14px);
+ border-radius:24px;
+ padding:42px 35px;
+ width:90%;
+ max-width:420px;
+ text-align:center;
+ color:white;
+ box-shadow:0 15px 45px rgba(0,0,0,.35);
+ animation:fadeUp .9s ease;
 }
 
 /* ===== TEXT ===== */
-.glass h1 {
-  font-size: 2rem;
-  margin-bottom: 10px;
+.glass h1{
+ font-size:2.2rem;
+ margin-bottom:12px;
+ letter-spacing:.5px;
 }
 
-.glass p {
-  font-size: 1rem;
-  margin-bottom: 30px;
-  opacity: 0.9;
+.glass p{
+ font-size:1rem;
+ opacity:.95;
+ margin-bottom:35px;
+ line-height:1.4;
 }
 
 /* ===== BUTTONS ===== */
-.buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+.buttons{
+ display:flex;
+ flex-direction:column;
+ gap:16px;
 }
 
-.buttons a {
-  text-decoration: none;
-  padding: 12px;
-  border-radius: 30px;
-  font-weight: bold;
-  transition: 0.3s;
+.buttons a{
+ text-decoration:none;
+ padding:14px;
+ border-radius:30px;
+ font-weight:600;
+ font-size:1rem;
+ transition:.3s ease;
 }
 
-/* Login Button */
-.login {
-  background: rgba(255, 255, 255, 0.85);
-  color: #e91e63;
+/* Login */
+.login{
+ background:white;
+ color:#e91e63;
+ box-shadow:0 8px 25px rgba(233,30,99,.35);
+}
+.login:hover{
+ transform:translateY(-2px);
+ box-shadow:0 12px 30px rgba(233,30,99,.45);
 }
 
-.login:hover {
-  background: white;
+/* Signup */
+.signup{
+ border:2px solid white;
+ color:white;
 }
-
-/* Signup Button */
-.signup {
-  border: 2px solid white;
-  color: white;
-}
-
-.signup:hover {
-  background: white;
-  color: #e91e63;
+.signup:hover{
+ background:white;
+ color:#e91e63;
+ transform:translateY(-2px);
 }
 
 /* ===== FOOTER ===== */
-.footer {
-  margin-top: 25px;
-  font-size: 0.8rem;
-  opacity: 0.8;
+.footer{
+ margin-top:30px;
+ font-size:.8rem;
+ opacity:.85;
+}
+
+/* ===== ANIMATION ===== */
+@keyframes fadeUp{
+ from{
+  opacity:0;
+  transform:translateY(20px);
+ }
+ to{
+  opacity:1;
+  transform:translateY(0);
+ }
 }
 </style>
 </head>
@@ -97,17 +119,17 @@ body {
 <body>
 
 <div class="glass">
-  <h1>❤️ Clark Dating</h1>
-  <p>Find love, chat & connect with real people</p>
+ <h1>❤️ Clark Dating</h1>
+ <p>Find love, chat and connect with real people near you</p>
 
-  <div class="buttons">
-    <a href="login.html" class="login">Login</a>
-    <a href="signup.html" class="signup">Sign Up</a>
-  </div>
+ <div class="buttons">
+  <a href="login.html" class="login">Login</a>
+  <a href="signup.html" class="signup">Create Account</a>
+ </div>
 
-  <div class="footer">
-    © 2026 Clark Online Dating
-  </div>
+ <div class="footer">
+  © 2026 Clark Online Dating
+ </div>
 </div>
 
 </body>
