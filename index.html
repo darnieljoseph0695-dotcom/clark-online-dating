@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clark Online Dating</title>
+<title>Clark Dating</title>
 
 <style>
 /* ===== RESET ===== */
@@ -14,103 +14,125 @@
  font-family:"Segoe UI",sans-serif;
 }
 
-/* ===== BACKGROUND ===== */
+/* ===== TINDER BACKGROUND ===== */
 body{
  min-height:100vh;
- background:
-  linear-gradient(
-   rgba(233,30,99,.45),
-   rgba(0,0,0,.55)
-  ),
-  url("darny.jpeg") no-repeat center/cover;
+ background:linear-gradient(135deg,#fd267a,#ff6036);
  display:flex;
  justify-content:center;
  align-items:center;
-}
-
-/* ===== GLASS CARD ===== */
-.glass{
- background:rgba(255,255,255,.18);
- backdrop-filter:blur(14px);
- -webkit-backdrop-filter:blur(14px);
- border-radius:24px;
- padding:42px 35px;
- width:90%;
- max-width:420px;
- text-align:center;
  color:white;
- box-shadow:0 15px 45px rgba(0,0,0,.35);
- animation:fadeUp .9s ease;
 }
 
-/* ===== TEXT ===== */
-.glass h1{
- font-size:2.2rem;
- margin-bottom:12px;
- letter-spacing:.5px;
+/* ===== MAIN CONTAINER ===== */
+.container{
+ width:100%;
+ max-width:420px;
+ padding:25px;
+ text-align:center;
 }
 
-.glass p{
+/* ===== LOGO ===== */
+.logo{
+ font-size:2.5rem;
+ font-weight:700;
+ margin-bottom:10px;
+}
+
+.tagline{
  font-size:1rem;
  opacity:.95;
- margin-bottom:35px;
- line-height:1.4;
+ margin-bottom:30px;
+}
+
+/* ===== CARD ===== */
+.card{
+ background:white;
+ border-radius:18px;
+ padding:30px 25px;
+ color:#333;
+ box-shadow:0 20px 50px rgba(0,0,0,.3);
+ animation:pop .6s ease;
+}
+
+/* ===== PROFILE PREVIEW ===== */
+.preview{
+ height:260px;
+ border-radius:14px;
+ background:url("darny.jpeg") no-repeat center/cover;
+ position:relative;
+ margin-bottom:20px;
+}
+
+.preview::after{
+ content:"";
+ position:absolute;
+ inset:0;
+ background:linear-gradient(to top,rgba(0,0,0,.6),transparent);
+ border-radius:14px;
+}
+
+.preview span{
+ position:absolute;
+ bottom:12px;
+ left:12px;
+ color:white;
+ font-weight:600;
+ z-index:2;
 }
 
 /* ===== BUTTONS ===== */
-.buttons{
+.actions{
  display:flex;
  flex-direction:column;
- gap:16px;
+ gap:14px;
+ margin-top:10px;
 }
 
-.buttons a{
+.actions a{
  text-decoration:none;
  padding:14px;
  border-radius:30px;
- font-weight:600;
  font-size:1rem;
- transition:.3s ease;
+ font-weight:600;
+ transition:.25s;
 }
 
-/* Login */
+/* LOGIN */
 .login{
- background:white;
- color:#e91e63;
- box-shadow:0 8px 25px rgba(233,30,99,.35);
-}
-.login:hover{
- transform:translateY(-2px);
- box-shadow:0 12px 30px rgba(233,30,99,.45);
-}
-
-/* Signup */
-.signup{
- border:2px solid white;
+ background:#fd267a;
  color:white;
 }
+.login:hover{
+ background:#ff4d88;
+}
+
+/* SIGNUP */
+.signup{
+ border:2px solid #fd267a;
+ color:#fd267a;
+}
 .signup:hover{
- background:white;
- color:#e91e63;
- transform:translateY(-2px);
+ background:#fd267a;
+ color:white;
 }
 
 /* ===== FOOTER ===== */
 .footer{
- margin-top:30px;
- font-size:.8rem;
+ margin-top:20px;
+ font-size:.75rem;
  opacity:.85;
 }
 
 /* ===== ANIMATION ===== */
-@keyframes fadeUp{
+@keyframes pop{
  from{
+  transform:scale(.9);
   opacity:0;
-  transform:translateY(20px);
  }
  to{
+  transform:scale(1);
   opacity:1;
-  transform:translateY(0);
  }
 }
 </style>
@@ -118,17 +140,23 @@ body{
 
 <body>
 
-<div class="glass">
- <h1>❤️ Clark Dating</h1>
- <p>Find love, chat and connect with real people near you</p>
+<div class="container">
+ <div class="logo">🔥 Clark</div>
+ <div class="tagline">Match. Chat. Fall in love.</div>
 
- <div class="buttons">
-  <a href="login.html" class="login">Login</a>
-  <a href="signup.html" class="signup">Create Account</a>
+ <div class="card">
+  <div class="preview">
+   <span>Nearby • 2km away</span>
+  </div>
+
+  <div class="actions">
+   <a href="login.html" class="login">Log In</a>
+   <a href="signup.html" class="signup">Create Account</a>
+  </div>
  </div>
 
  <div class="footer">
-  © 2026 Clark Online Dating
+  © 2026 Clark Dating
  </div>
 </div>
 
