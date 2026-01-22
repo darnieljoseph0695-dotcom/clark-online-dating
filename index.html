@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clark Dating</title>
+<title>Clark Dating – Swipe</title>
 
 <style>
-/* ===== RESET ===== */
 *{
  margin:0;
  padding:0;
@@ -14,7 +13,6 @@
  font-family:"Segoe UI",sans-serif;
 }
 
-/* ===== TINDER BACKGROUND ===== */
 body{
  min-height:100vh;
  background:linear-gradient(135deg,#fd267a,#ff6036);
@@ -22,143 +20,282 @@ body{
  justify-content:center;
  align-items:center;
  color:white;
+ overflow:hidden;
 }
 
-/* ===== MAIN CONTAINER ===== */
-.container{
+/* APP */
+.app{
  width:100%;
  max-width:420px;
- padding:25px;
+ padding:20px;
  text-align:center;
 }
 
-/* ===== LOGO ===== */
-.logo{
- font-size:2.5rem;
- font-weight:700;
- margin-bottom:10px;
-}
-
-.tagline{
- font-size:1rem;
- opacity:.95;
- margin-bottom:30px;
-}
-
-/* ===== CARD ===== */
+/* CARD */
 .card{
- background:white;
- border-radius:18px;
- padding:30px 25px;
- color:#333;
- box-shadow:0 20px 50px rgba(0,0,0,.3);
- animation:pop .6s ease;
-}
-
-/* ===== PROFILE PREVIEW ===== */
-.preview{
- height:260px;
- border-radius:14px;
- background:url("darny.jpeg") no-repeat center/cover;
+ width:100%;
+ height:540px;
+ background-size:cover;
+ background-position:center;
+ border-radius:20px;
+ box-shadow:0 25px 60px rgba(0,0,0,.4);
+ cursor:grab;
  position:relative;
- margin-bottom:20px;
+ animation:appear .4s ease;
 }
 
-.preview::after{
+/* GRADIENT */
+.card::after{
  content:"";
  position:absolute;
  inset:0;
- background:linear-gradient(to top,rgba(0,0,0,.6),transparent);
- border-radius:14px;
+ background:linear-gradient(to top,rgba(0,0,0,.7),transparent);
+ border-radius:20px;
 }
 
-.preview span{
+/* INFO */
+.info{
  position:absolute;
- bottom:12px;
- left:12px;
- color:white;
- font-weight:600;
+ bottom:20px;
+ left:20px;
  z-index:2;
+ text-align:left;
 }
 
-/* ===== BUTTONS ===== */
+.info h2{font-size:1.6rem}
+.info p{opacity:.9}
+
+/* BADGES */
+.badge{
+ position:absolute;
+ top:20px;
+ padding:10px 18px;
+ border:3px solid;
+ border-radius:10px;
+ font-weight:700;
+ font-size:1.1rem;
+ opacity:0;
+}
+
+.like{
+ right:20px;
+ color:#4caf50;
+ border-color:#4caf50;
+ transform:rotate(15deg);
+}
+
+.nope{
+ left:20px;
+ color:#f44336;
+ border-color:#f44336;
+ transform:rotate(-15deg);
+}
+
+/* ACTIONS */
 .actions{
  display:flex;
- flex-direction:column;
- gap:14px;
- margin-top:10px;
+ justify-content:space-around;
+ margin-top:25px;
 }
 
-.actions a{
- text-decoration:none;
- padding:14px;
+.btn{
+ width:60px;
+ height:60px;
+ border-radius:50%;
+ background:white;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ font-size:1.8rem;
+ cursor:pointer;
+ box-shadow:0 10px 30px rgba(0,0,0,.3);
+}
+
+.btn.like{color:#4caf50}
+.btn.nope{color:#f44336}
+
+/* MATCH POPUP */
+.match{
+ position:fixed;
+ inset:0;
+ background:linear-gradient(135deg,#fd267a,#ff6036);
+ display:flex;
+ flex-direction:column;
+ justify-content:center;
+ align-items:center;
+ text-align:center;
+ z-index:999;
+ animation:fade .4s ease;
+}
+
+.match h1{
+ font-size:2.5rem;
+ margin-bottom:10px;
+}
+
+.match p{
+ font-size:1.1rem;
+ margin-bottom:20px;
+}
+
+.match button{
+ padding:12px 30px;
+ border:none;
  border-radius:30px;
  font-size:1rem;
  font-weight:600;
- transition:.25s;
+ cursor:pointer;
 }
 
-/* LOGIN */
-.login{
- background:#fd267a;
- color:white;
-}
-.login:hover{
- background:#ff4d88;
+.hidden{display:none}
+
+/* ANIMATIONS */
+@keyframes appear{
+ from{opacity:0;transform:translateY(30px) scale(.95)}
+ to{opacity:1;transform:none}
 }
 
-/* SIGNUP */
-.signup{
- border:2px solid #fd267a;
- color:#fd267a;
-}
-.signup:hover{
- background:#fd267a;
- color:white;
-}
-
-/* ===== FOOTER ===== */
-.footer{
- margin-top:20px;
- font-size:.75rem;
- opacity:.85;
-}
-
-/* ===== ANIMATION ===== */
-@keyframes pop{
- from{
-  transform:scale(.9);
-  opacity:0;
- }
- to{
-  transform:scale(1);
-  opacity:1;
- }
+@keyframes fade{
+ from{opacity:0}
+ to{opacity:1}
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
- <div class="logo">🔥 Clark</div>
- <div class="tagline">Match. Chat. Fall in love.</div>
+<div class="app">
+ <div id="cardHolder"></div>
 
- <div class="card">
-  <div class="preview">
-   <span>Nearby • 2km away</span>
-  </div>
-
-  <div class="actions">
-   <a href="login.html" class="login">Log In</a>
-   <a href="signup.html" class="signup">Create Account</a>
-  </div>
- </div>
-
- <div class="footer">
-  © 2026 Clark Dating
+ <div class="actions">
+  <div class="btn nope" onclick="manualSwipe(-1)">✖</div>
+  <div class="btn like" onclick="manualSwipe(1)">❤</div>
  </div>
 </div>
+
+<!-- MATCH POPUP -->
+<div id="matchPopup" class="match hidden">
+ <h1>🎉 It's a Match!</h1>
+ <p>You and <span id="matchName"></span> like each other</p>
+ <button onclick="closeMatch()">Continue</button>
+</div>
+
+<script>
+/* FAKE PROFILES (demo) */
+const profiles=[
+ {name:"Aisha",age:22,img:"darny.jpeg",dist:"2km away",likedYou:true},
+ {name:"Neema",age:24,img:"darny.jpeg",dist:"5km away",likedYou:false},
+ {name:"Joyce",age:21,img:"darny.jpeg",dist:"1km away",likedYou:true},
+ {name:"Sophia",age:25,img:"darny.jpeg",dist:"3km away",likedYou:false}
+];
+
+const holder=document.getElementById("cardHolder");
+const popup=document.getElementById("matchPopup");
+const matchName=document.getElementById("matchName");
+
+let index=0;
+let startX=0,currentX=0,dragging=false,activeCard=null;
+
+loadCard();
+
+/* LOAD ONE CARD */
+function loadCard(){
+ if(index>=profiles.length){
+  holder.innerHTML="<p>No more profiles</p>";
+  return;
+ }
+ const p=profiles[index];
+ const card=document.createElement("div");
+ card.className="card";
+ card.style.backgroundImage=`url(${p.img})`;
+ card.innerHTML=`
+  <div class="badge like">LIKE</div>
+  <div class="badge nope">NOPE</div>
+  <div class="info">
+   <h2>${p.name}, ${p.age}</h2>
+   <p>📍 ${p.dist}</p>
+  </div>
+ `;
+ holder.innerHTML="";
+ holder.appendChild(card);
+ activeCard=card;
+ attachSwipe(card,p);
+}
+
+/* SWIPE LOGIC */
+function attachSwipe(card,profile){
+ const like=card.querySelector(".like");
+ const nope=card.querySelector(".nope");
+
+ card.addEventListener("mousedown",start);
+ card.addEventListener("touchstart",start);
+
+ document.addEventListener("mousemove",move);
+ document.addEventListener("touchmove",move);
+
+ document.addEventListener("mouseup",end);
+ document.addEventListener("touchend",end);
+
+ function start(e){
+  dragging=true;
+  startX=e.touches?e.touches[0].clientX:e.clientX;
+  card.style.transition="none";
+ }
+
+ function move(e){
+  if(!dragging)return;
+  currentX=(e.touches?e.touches[0].clientX:e.clientX)-startX;
+  card.style.transform=`translateX(${currentX}px) rotate(${currentX/15}deg)`;
+  like.style.opacity=currentX>0?Math.min(currentX/100,1):0;
+  nope.style.opacity=currentX<0?Math.min(-currentX/100,1):0;
+ }
+
+ function end(){
+  if(!dragging)return;
+  dragging=false;
+  if(Math.abs(currentX)>120){
+   swipe(card,currentX>0?1:-1,profile);
+  }else reset(card,like,nope);
+ }
+}
+
+function swipe(card,dir,profile){
+ card.style.transition="transform .4s ease";
+ card.style.transform=`translateX(${dir*1000}px) rotate(${dir*30}deg)`;
+
+ if(dir===1 && profile.likedYou){
+  setTimeout(()=>showMatch(profile.name),300);
+ }
+
+ setTimeout(()=>{
+  index++;
+  currentX=0;
+  loadCard();
+ },400);
+}
+
+function reset(card,like,nope){
+ card.style.transition="transform .3s ease";
+ card.style.transform="translateX(0)";
+ like.style.opacity=0;
+ nope.style.opacity=0;
+ currentX=0;
+}
+
+function manualSwipe(dir){
+ if(activeCard) swipe(activeCard,dir,profiles[index]);
+}
+
+/* MATCH */
+function showMatch(name){
+ matchName.textContent=name;
+ popup.classList.remove("hidden");
+}
+
+function closeMatch(){
+ popup.classList.add("hidden");
+}
+</script>
 
 </body>
 </html>
