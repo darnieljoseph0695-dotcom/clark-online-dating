@@ -38,3 +38,28 @@ label{font-weight:600;font-size:14px;}
 #chat-input{display:flex;}
 #chat-input input{flex:1;padding:10px;border:none;border-radius:10px;margin:5px;}
 #chat-input button{padding:10px;border:none;border-radius:10px;background:#4cd964;color:white;margin:5px;}
+#homepage {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden; /* Hii inahakikisha fade in works properly */
+    color: white;
+}
+
+#homepage::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1;
+}
+
+#homepage h1, #homepage p, .cta-button {
+    position: relative;
+    z-index: 2;
+    transition: transform 0.3s;
+}
