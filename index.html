@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clark Online Dating</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Homepage -->
+<div id="homepage">
+    <h1>Clark Online Dating</h1>
+    <p>Meet amazing people near you. Swipe, connect, and find your match!</p>
+    <button class="cta-button" id="browseBtn">Browse Profiles</button>
+</div>
+
+<!-- Signup Form -->
+<div class="container hidden" id="signup-section">
+    <h2>Sign Up</h2>
+    <form id="signup-form">
+        <label>Email</label><input type="email" id="email" required placeholder="Email">
+        <label>Password</label><input type="password" id="password" required placeholder="Password">
+        <label>Name</label><input type="text" id="name" required placeholder="Your Name">
+        <label>Age</label><input type="number" id="age" required placeholder="Your Age">
+        <label>Description</label><textarea id="desc" required placeholder="About you"></textarea>
+        <label>Profile Photos</label><input type="file" id="photo" accept="image/*" multiple required>
+        <img id="photo-preview" src="" class="hidden">
+        <button type="submit">Sign Up</button>
+    </form>
+</div>
+
+<!-- App -->
+<div id="app">
+    <div class="buttons">
+        <button class="dislike" id="btnDislike">✖</button>
+        <button class="like" id="btnLike">❤️</button>
+        <button id="chat-btn">💬</button>
+    </div>
+</div>
+
+<!-- Chat Box -->
+<div id="chat-box">
+    <div id="chat-messages"></div>
+    <div id="chat-input">
+        <input type="text" id="chat-text" placeholder="Type message...">
+        <button id="sendChatBtn">Send</button>
+    </div>
+</div>
+
+<!-- JS -->
+<script type="module" src="app.js"></script>
+</body>
+</html>
