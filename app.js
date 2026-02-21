@@ -7,7 +7,8 @@ const backgrounds = [
     'https://images.unsplash.com/photo-1509228627157-6b1b1c7773fc?auto=format&fit=crop&w=1350&q=80',
     'https://images.unsplash.com/photo-1519677100203-a0e668c92439?auto=format&fit=crop&w=1350&q=80',
     'https://images.unsplash.com/photo-1498931299472-8ca5b9a200b3?auto=format&fit=crop&w=1350&q=80',
-    'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=1350&q=80'
+    'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=1350&q=80',
+    'image.jpg'
 ];
 
 let index = 0;
