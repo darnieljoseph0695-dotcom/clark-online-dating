@@ -4,262 +4,217 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clark Online Dating</title>
-
 <style>
 body{margin:0;font-family:'Poppins',sans-serif;background:#ff9a9e;color:white;}
 .hidden{display:none;}
 button{cursor:pointer;border:none}
 
-/* Homepage */
-#homepage{
-height:100vh;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-text-align:center;
-background:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
-position:relative;
-overflow:hidden;
+/* Login Page */
+#login-page{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  background:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
+  position:relative;
 }
-#homepage::after{
-content:"";
-position:absolute;
-top:0;left:0;right:0;bottom:0;
-background:rgba(0,0,0,0.5);
+#login-page::after{
+  content:"";
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.5);
 }
-#homepage h1,#homepage p,.cta-button{position:relative;z-index:2;}
-.cta-button{
-padding:15px 40px;
-font-size:1.2rem;
-background:#ff6b81;
-border-radius:50px;
-color:white;
+#login-page h1,#login-page input,#login-page button{position:relative;z-index:2;}
+#login-page input{
+  padding:10px; margin:10px; width:200px; border-radius:10px; border:1px solid #ccc;
+}
+#login-page button{
+  padding:10px 20px; border-radius:20px; background:#4cd964; color:white; border:none; cursor:pointer;
 }
 
 /* App */
 #app{
-width:360px;
-height:640px;
-background:#fff;
-color:#000;
-border-radius:25px;
-overflow:hidden;
-position:relative;
-margin:40px auto;
-display:none;
-box-shadow:0 10px 30px rgba(0,0,0,0.2);
+  width:360px; height:640px; background:#fff; color:#000;
+  border-radius:25px; overflow:hidden; position:relative; margin:40px auto;
+  display:none; box-shadow:0 10px 30px rgba(0,0,0,0.2);
 }
 
 /* Top bar */
 .top-bar{
-position:absolute;
-top:0;
-width:100%;
-height:60px;
-background:#fff;
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:0 15px;
-z-index:20;
-font-weight:bold;
+  position:absolute; top:0; width:100%; height:60px; background:#fff;
+  display:flex; justify-content:space-between; align-items:center; padding:0 15px; z-index:20; font-weight:bold;
 }
 .logo{color:#ff4d6d;font-size:20px;}
 .top-icons span{margin-left:15px;font-size:18px;cursor:pointer;}
 
 .page{
-width:100%;
-height:100%;
-position:absolute;
-top:0;
-left:0;
-padding-top:60px;
+  width:100%; height:100%; position:absolute; top:0; left:0; padding-top:60px;
 }
 
 .profile-card{
-width:100%;
-height:100%;
-background-size:cover;
-background-position:center;
-display:flex;
-flex-direction:column;
-justify-content:flex-end;
-padding:20px;
-color:white;
-text-shadow:0 2px 8px rgba(0,0,0,0.6);
-transition:transform 0.3s ease;
+  width:100%; height:100%; background-size:cover; background-position:center;
+  display:flex; flex-direction:column; justify-content:flex-end; padding:20px;
+  color:white; text-shadow:0 2px 8px rgba(0,0,0,0.6); transition:transform 0.3s ease;
 }
 
 .profile-info{
-background:rgba(0,0,0,0.4);
-border-radius:20px;
-padding:15px;
+  background:rgba(0,0,0,0.4); border-radius:20px; padding:15px;
 }
 
 .verified{color:#1da1f2;}
 .distance{font-size:14px;opacity:0.9;}
 
 .buttons{
-position:absolute;
-bottom:70px;
-width:100%;
-display:flex;
-justify-content:space-around;
+  position:absolute; bottom:70px; width:100%; display:flex; justify-content:space-around;
 }
-
 .buttons button{
-width:60px;height:60px;
-border-radius:50%;
-font-size:20px;
-color:white;
+  width:60px;height:60px;border-radius:50%;font-size:20px;color:white;
 }
-
 .dislike{background:#ff4d6d;}
 .like{background:#4cd964;}
 .boost{background:#f5b700;}
 .superlike{background:#4facfe;}
 
 .bottom-nav{
-position:absolute;
-bottom:0;
-width:100%;
-height:60px;
-background:#fff;
-display:flex;
-justify-content:space-around;
-align-items:center;
-border-top:1px solid #eee;
+  position:absolute; bottom:0; width:100%; height:60px; background:#fff;
+  display:flex; justify-content:space-around; align-items:center; border-top:1px solid #eee;
 }
-.bottom-nav button{
-background:none;
-font-size:22px;
-color:black;
-}
+.bottom-nav button{background:none; font-size:22px; color:black;}
 
 .like-card{
-background:#fff;
-padding:10px;
-border-radius:15px;
-margin:10px;
-box-shadow:0 4px 10px rgba(0,0,0,0.1);
+  background:#fff; padding:10px; border-radius:15px; margin:10px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1); cursor:pointer;
 }
 
-/* Chat */
+/* Chat container */
 #chat-container{
-display:flex;
-flex-direction:column;
+  display:flex; flex-direction:column; height:70%; overflow-y:auto;
+  padding:10px; border:1px solid #eee; border-radius:15px; margin:10px 0;
+  background:#f5f5f5;
 }
+
+/* Chat bubbles WhatsApp style */
+.chat-bubble{
+  padding:10px 15px; margin:5px 0; border-radius:20px; max-width:70%; word-wrap:break-word;
+}
+.chat-bubble.user{background:#4cd964;color:white;align-self:flex-end;border-bottom-right-radius:0;}
+.chat-bubble.match{background:#eee;color:black;align-self:flex-start;border-bottom-left-radius:0;}
+
+/* Match popup */
+#match-popup{
+  position:fixed; top:50%; left:50%; transform:translate(-50%, -50%) scale(0);
+  background:rgba(255,255,255,0.9); border-radius:50%; width:200px; height:200px;
+  display:flex; justify-content:center; align-items:center; font-size:24px;
+  color:#ff4d6d; z-index:999; transition:transform 0.5s ease; text-align:center; padding:10px;
+}
+#match-popup.show{transform:translate(-50%, -50%) scale(1);}
 </style>
 </head>
 <body>
 
-<!-- Homepage -->
-<div id="homepage">
-<h1>Clark Online Dating</h1>
-<p>Meet amazing people near you.</p>
-<button class="cta-button" id="browseBtn">Browse Profiles</button>
+<!-- Login Page -->
+<div id="login-page">
+  <h1>Welcome to Clark 🔥</h1>
+  <input id="username" type="text" placeholder="Enter your name">
+  <button id="loginBtn">Login / Sign Up</button>
 </div>
 
 <!-- App -->
 <div id="app">
-
 <div class="top-bar">
-<span class="logo">🔥 Clark</span>
-<div class="top-icons">
-<span>🔔</span>
-<span>⚙</span>
-</div>
+  <span class="logo">🔥 Clark</span>
+  <div class="top-icons">
+    <span>🔔</span><span>⚙</span>
+  </div>
 </div>
 
 <div id="swipe-page" class="page"></div>
-
-<div id="explore-page" class="page hidden">
-<h3 style="text-align:center;">Explore Nearby 📍</h3>
-<p style="padding:15px;">People near your location will appear here.</p>
-</div>
-
-<div id="likes-page" class="page hidden">
-<h3 style="text-align:center;">People You Liked ❤️</h3>
-<div id="likes-container"></div>
-</div>
-
-<div id="matches-page" class="page hidden">
-<h3 style="text-align:center;">Your Matches 💕</h3>
-<div id="matches-container"></div>
-</div>
-
-<div id="profile-page" class="page hidden">
-<h3 style="text-align:center;">Your Profile 👤</h3>
-<p style="padding:15px;">Name: Clark User<br>Age: 25</p>
-</div>
+<div id="explore-page" class="page hidden"><h3 style="text-align:center;">Explore Nearby 📍</h3><p style="padding:15px;">People near you</p></div>
+<div id="likes-page" class="page hidden"><h3 style="text-align:center;">People You Liked ❤️</h3><div id="likes-container"></div></div>
+<div id="matches-page" class="page hidden"><h3 style="text-align:center;">Your Matches 💕</h3><div id="matches-container"></div></div>
+<div id="profile-page" class="page hidden"><h3 style="text-align:center;">Your Profile 👤</h3><p style="padding:15px;">Name: Clark User<br>Age: 25</p></div>
 
 <!-- Chat Page -->
 <div id="chat-page" class="page hidden">
-<h3 style="text-align:center;">Chat 💬</h3>
-<div id="chat-container" style="padding:15px; height:70%; overflow-y:auto; border:1px solid #eee; border-radius:15px; margin:10px 0;"></div>
-<div style="display:flex; padding:10px;">
-<input id="chat-input" type="text" placeholder="Type a message..." style="flex:1; padding:10px; border-radius:20px; border:1px solid #ccc;">
-<button id="send-btn" style="margin-left:10px; padding:10px 20px; border-radius:20px; background:#4cd964; color:white;">Send</button>
-</div>
-<button onclick="showPage('swipe')" style="margin:10px; padding:10px 20px; border-radius:20px; background:#ff6b81; color:white;">Back 🔥</button>
+  <h3 style="text-align:center;">Chat 💬</h3>
+  <div id="chat-container">Select a match to chat</div>
+  <div style="display:flex; padding:10px;">
+    <input id="chat-input" type="text" placeholder="Type a message..." style="flex:1; padding:10px; border-radius:20px; border:1px solid #ccc;">
+    <button id="send-btn" style="margin-left:10px; padding:10px 20px; border-radius:20px; background:#4cd964; color:white;">Send</button>
+  </div>
+  <button onclick="showPage('matches')" style="margin:10px; padding:10px 20px; border-radius:20px; background:#ff6b81; color:white;">Back 🔥</button>
 </div>
 
 <div class="buttons">
-<button class="boost">⚡</button>
-<button class="dislike" id="btnDislike">✖</button>
-<button class="like" id="btnLike">❤️</button>
-<button class="superlike">⭐</button>
+  <button class="boost">⚡</button>
+  <button class="dislike" id="btnDislike">✖</button>
+  <button class="like" id="btnLike">❤️</button>
+  <button class="superlike">⭐</button>
 </div>
 
 <div class="bottom-nav">
-<button onclick="showPage('swipe')">🔥</button>
-<button onclick="showPage('explore')">📍</button>
-<button onclick="showPage('likes')">❤️</button>
-<button onclick="showPage('matches')">💬</button>
-<button onclick="showPage('profile')">👤</button>
+  <button onclick="showPage('swipe')">🔥</button>
+  <button onclick="showPage('explore')">📍</button>
+  <button onclick="showPage('likes')">❤️</button>
+  <button onclick="showChatPage()">💬</button>
+  <button onclick="showPage('profile')">👤</button>
+</div>
 </div>
 
-</div>
+<div id="match-popup"></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-const homepage=document.getElementById("homepage");
-const app=document.getElementById("app");
-document.getElementById("browseBtn").onclick=function(){
-  homepage.style.display="none";
-  app.style.display="block";
-}
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyB8uRhsUJCxVO8gs7bNBhRYKh_JJEhrfDE",
+  authDomain: "clark-56699.firebaseapp.com",
+  projectId: "clark-56699",
+  storageBucket: "clark-56699.firebasestorage.app",
+  messagingSenderId: "254939761656",
+  appId: "1:254939761656:web:31cb53af0b6210f71b640d",
+  measurementId: "G-9PRJGJY11P"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-/* Profiles */
+// Pages
+const loginPage=document.getElementById("login-page");
+const app=document.getElementById("app");
+const usernameInput=document.getElementById("username");
+const loginBtn=document.getElementById("loginBtn");
+let currentUser=null;
+
+loginBtn.onclick=async ()=>{
+  const name=usernameInput.value.trim();
+  if(name===""){alert("Please enter your name"); return;}
+  currentUser=name;
+  await db.collection("users").doc(currentUser).set({name:currentUser, joined:firebase.firestore.FieldValue.serverTimestamp()});
+  loginPage.style.display="none";
+  app.style.display="block";
+};
+
+// Profiles
 const profiles=[
   {name:"Sophia",age:23,image:"https://randomuser.me/api/portraits/women/44.jpg"},
   {name:"Emma",age:25,image:"https://randomuser.me/api/portraits/women/65.jpg"},
   {name:"Olivia",age:22,image:"https://randomuser.me/api/portraits/women/68.jpg"}
 ];
-
-let index=0;
-let likedProfiles=[];
-let matchedProfiles=[];
-
+let index=0,likedProfiles=[],matchedProfiles=[];
 const swipePage=document.getElementById("swipe-page");
 const likesContainer=document.getElementById("likes-container");
 const matchesContainer=document.getElementById("matches-container");
 
 function loadProfile(){
-  if(index>=profiles.length){
-    swipePage.innerHTML="<h3 style='text-align:center;margin-top:50%;'>No more profiles</h3>";
-    return;
-  }
+  if(index>=profiles.length){swipePage.innerHTML="<h3 style='text-align:center;margin-top:50%;'>No more profiles</h3>"; return;}
   const p=profiles[index];
-  swipePage.innerHTML=`
-    <div class="profile-card" id="card"
-    style="background-image:url('${p.image}')">
-    <div class="profile-info">
-      <h2>${p.name}, ${p.age} <span class="verified">✔</span></h2>
-      <p class="distance">📍 ${Math.floor(Math.random()*10)+1} km away</p>
-    </div>
-    </div>
-  `;
+  swipePage.innerHTML=`<div class="profile-card" id="card" style="background-image:url('${p.image}')">
+  <div class="profile-info"><h2>${p.name}, ${p.age} <span class="verified">✔</span></h2>
+  <p class="distance">📍 ${Math.floor(Math.random()*10)+1} km away</p></div></div>`;
   addSwipeEffect();
 }
 loadProfile();
@@ -267,32 +222,20 @@ loadProfile();
 function addSwipeEffect(){
   const card=document.getElementById("card");
   let startX=0,currentX=0,isDragging=false;
-
   card.addEventListener("mousedown",startDrag);
   card.addEventListener("touchstart",startDrag);
-
-  function startDrag(e){
-    isDragging=true;
-    startX=e.type==="touchstart"?e.touches[0].clientX:e.clientX;
+  function startDrag(e){isDragging=true; startX=e.type==="touchstart"?e.touches[0].clientX:e.clientX;
     document.addEventListener("mousemove",drag);
     document.addEventListener("touchmove",drag);
     document.addEventListener("mouseup",endDrag);
     document.addEventListener("touchend",endDrag);
   }
-
-  function drag(e){
-    if(!isDragging)return;
-    currentX=e.type==="touchmove"?e.touches[0].clientX:e.clientX;
+  function drag(e){if(!isDragging)return; currentX=e.type==="touchmove"?e.touches[0].clientX:e.clientX;
     let diff=currentX-startX;
     card.style.transform=`translateX(${diff}px) rotate(${diff/10}deg)`;
   }
-
-  function endDrag(){
-    isDragging=false;
-    let diff=currentX-startX;
-    if(diff>100)likeAction();
-    else if(diff<-100)dislikeAction();
-    else card.style.transform="translateX(0px)";
+  function endDrag(){isDragging=false; let diff=currentX-startX;
+    if(diff>100)likeAction(); else if(diff<-100)dislikeAction(); else card.style.transform="translateX(0px)";
     document.removeEventListener("mousemove",drag);
     document.removeEventListener("touchmove",drag);
     document.removeEventListener("mouseup",endDrag);
@@ -300,94 +243,77 @@ function addSwipeEffect(){
   }
 }
 
-function likeAction(){
-  const profile=profiles[index];
-  likedProfiles.push(profile);
-  if(Math.random()>0.5){
-    matchedProfiles.push(profile);
-    openChat(profile); // ← OPEN CHAT PAGE
-  }
-  renderLikes();
-  renderMatches();
-  index++;
-  loadProfile();
-}
-
-function dislikeAction(){
-  index++;
-  loadProfile();
-}
-
 document.getElementById("btnLike").onclick=likeAction;
 document.getElementById("btnDislike").onclick=dislikeAction;
 
+function likeAction(){
+  const profile=profiles[index];
+  likedProfiles.push(profile);
+  if(Math.random()>0.5){matchedProfiles.push(profile); showMatchPopup(profile);}
+  renderLikes(); renderMatches(); index++; loadProfile();
+}
+function dislikeAction(){index++; loadProfile();}
+
 function renderLikes(){
   likesContainer.innerHTML="";
-  likedProfiles.forEach(p=>{
-    likesContainer.innerHTML+=`<div class="like-card"><strong>${p.name}</strong>, ${p.age}</div>`;
-  });
+  likedProfiles.forEach(p=>{likesContainer.innerHTML+=`<div class="like-card"><strong>${p.name}</strong>, ${p.age}</div>`;});
 }
-
 function renderMatches(){
   matchesContainer.innerHTML="";
   matchedProfiles.forEach(p=>{
-    matchesContainer.innerHTML+=`<div class="like-card">💕 ${p.name}, ${p.age}</div>`;
+    matchesContainer.innerHTML+=`<div class="like-card" onclick="openChat('${p.name}')">💕 ${p.name}, ${p.age}</div>`;
   });
 }
 
-/* Show Page */
 function showPage(page){
   document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
   document.getElementById(page+"-page").classList.remove("hidden");
 }
 
-/* Chat System */
-function openChat(profile){
-  document.querySelectorAll(".page").forEach(p => p.classList.add("hidden"));
+function showChatPage(){
+  document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
   document.getElementById("chat-page").classList.remove("hidden");
-  
-  const chatContainer = document.getElementById("chat-container");
-  chatContainer.innerHTML = `<div style="text-align:center; color:#888; margin-bottom:10px;">Chat with ${profile.name}</div>`;
-  
-  window.currentChatUser = profile;
+  document.getElementById("chat-container").innerHTML="Select a match to chat";
 }
 
-document.getElementById("send-btn").onclick = () => {
-  const input = document.getElementById("chat-input");
-  const msg = input.value.trim();
-  if(msg === "") return;
-  
+function openChat(profileName){
+  const profile = matchedProfiles.find(p=>p.name===profileName);
+  if(!profile) return;
+  showPage("chat");
   const chatContainer = document.getElementById("chat-container");
-  const bubble = document.createElement("div");
-  bubble.style.padding = "8px 12px";
-  bubble.style.margin = "5px 0";
-  bubble.style.background = "#4cd964";
-  bubble.style.color = "white";
-  bubble.style.borderRadius = "15px";
-  bubble.style.alignSelf = "flex-end";
-  bubble.style.maxWidth = "70%";
-  bubble.innerText = msg;
-  chatContainer.appendChild(bubble);
-  
-  input.value = "";
-  chatContainer.scrollTop = chatContainer.scrollHeight;
+  chatContainer.innerHTML = `<div style="text-align:center; color:#888; margin-bottom:10px;">Chat with ${profile.name}</div>`;
+  window.currentChatId = currentUser + "_" + profile.name.toLowerCase();
+  db.collection("chats").doc(window.currentChatId).collection("messages")
+    .orderBy("timestamp")
+    .onSnapshot(snapshot=>{
+      chatContainer.innerHTML = `<div style="text-align:center; color:#888; margin-bottom:10px;">Chat with ${profile.name}</div>`;
+      snapshot.forEach(doc=>{
+        const data=doc.data();
+        const bubble=document.createElement("div");
+        bubble.classList.add("chat-bubble");
+        bubble.classList.add(data.sender===currentUser?"user":"match");
+        bubble.innerText=data.text;
+        chatContainer.appendChild(bubble);
+      });
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    });
+}
 
-  // Fake reply
-  setTimeout(() => {
-    const reply = document.createElement("div");
-    reply.style.padding = "8px 12px";
-    reply.style.margin = "5px 0";
-    reply.style.background = "#eee";
-    reply.style.color = "#000";
-    reply.style.borderRadius = "15px";
-    reply.style.alignSelf = "flex-start";
-    reply.style.maxWidth = "70%";
-    reply.innerText = "Hi! Nice to match with you 😎";
-    chatContainer.appendChild(reply);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-  }, 1000);
-};
+document.getElementById("send-btn").onclick=()=>{
+  const input=document.getElementById("chat-input");
+  const msg=input.value.trim(); if(msg==="") return;
+  db.collection("chats").doc(window.currentChatId).collection("messages").add({
+    sender:currentUser, text:msg, timestamp:firebase.firestore.FieldValue.serverTimestamp()
+  });
+  input.value="";
+}
+
+function showMatchPopup(profile){
+  const popup=document.getElementById("match-popup");
+  popup.innerHTML=`💕 It's a Match with ${profile.name}! 💕`;
+  popup.classList.add("show");
+  setTimeout(()=>{popup.classList.remove("show");},2000);
+}
 </script>
-
 </body>
 </html>
